@@ -1,4 +1,4 @@
-## Protocol 1.1.0pre
+## Protocol 1.1.0-pre
 
 ### Subscriptions
 
