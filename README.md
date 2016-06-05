@@ -1,42 +1,24 @@
-## Protocol 1.1.0-pre
+# Swarm Protocol 1.1.1-pre #
 
-Common message spec examples
+Swarm is a protocol for op log based synchronization that supports massively replicated eventually consistent databases.
+Swarm is designed to function both on the server and the client side, hence it supports:
 
-### Subscriptions
+* partial datasets,
+* client-side caching,
+* offline work and
+* real-time incremental sync.
 
-    /Swarm#database!0.on+0user                  fresh client subscribes
-    /Swarm#database!stamp+Yorigin.on+YuserSSN   client reconn (scoped on)
-    /Swarm#database!now+Y.on+YuserNEW           client reon
-    /Swarm#database!0+X.on+Y                    peer Y bootstraps from X
-    /Swarm#database!bMarkTime+X.on+Y            peer Y reconnects to X
-    /Swarm#database!bMarkTime+X.0+Y             log bookmark from X to Y
-    /Object#stamp+XauthorSSN!0.on               client object sub
-    /Object#stamp+XauthorSSN!versn+YauthrZZN.on client object re-sub
-    /Object#stamp+XauthorSSN!pastTime.on        log segment request
+At its core, Swarm is a replication system for a *partially* ordered [operation](op.md) logs.
+On top of that, users can run versioned data structures formally described as Replicated Data Types.
+The Swarm's main focus is on op-based [CmRDTs](crdt.md#CmRDT).
+It also supports other constructs, such as state-based [CvRDT](crdt.md), logged asynchronous RPC and others.
 
-### Ops
+Swarm puts an accent on practicality.
+It arranges primitives in a way to make metadata overhead acceptable, a known hurdle in CRDT-based solutions.
+In particular, Swarm avoids the use of version vectors.
+Those turn untenable when every client device runs its own replica.
+Swarm [op format](op.md) is particularly lightweight to enable such apps as collaborative text editors where op==letter==keystroke.
 
-    /RPC#endpoint+Z!stamp+XauthrSSN.method+Z    RPC call
-    /RPC#endpoint+Z!stamp+X1.stamp+XauthrSSN    RPC response
-    /Object#id!stamp+YauthrSsn.field            LWW object write
-    /Object+~o#id+author!stamp+orig.field       type parameters
+A good entry point to start studying Swarm is its [subscription handshakes](handshake.md).
 
-### Messages
-
-    /Message#up!stamp+Ysender.msg+0user         message to a user
-
-### Source ids
-
-    ~+X                                         upstream
-    stamp+XuserSsn                              client incoming
-    stamp                                       outgoing
-    stamp+X                                     peer incoming
-    stamp+~                                     pre-handshake
-    0                                           internally generated
-
-### Key-value db
-
-    /Type#id!0-initOp+author.~
-    /Type#id!stamp+origin.op
-    /Type#id!stampOver-reorderd+orgn.op
-    /Type#id!~-stamp.~
+Use Swarm.
