@@ -52,16 +52,15 @@ There are four formats to encode the value:
 * multiline value (newline, then indented value lines) and
 * explicit length value.
 
-
-    % empty value:  spec LF
+Empty value:  spec LF
 
     /Swarm#database!0.on
 
-    % single line value:  spec HT value LF
+Single line value:  spec HT value LF
 
     /Object#1CQZ38+Y~!1CQa4+Xusernm1Q.NumbrField 123
 
-    % multiline value:  spec LF ( HT line LF ) *
+Multiline value:  spec LF ( HT line LF ) *
 
     /Swarm#database!1CQAneD1+X~.~
         !1CQAneD+X~.Access OwnWriteAllRead
@@ -71,7 +70,7 @@ There are four formats to encode the value:
         Second line
             Indented third line
 
-    % explicit length:  spec = base64length LF buffer LF*
+Explicit length value:  spec = base64length LF buffer LF*
 
     !1CQa6+Xusernm1Q.Buffer=A
     raw buffer
