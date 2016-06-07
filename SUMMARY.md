@@ -7,6 +7,9 @@
 * [Operations](op.md) - immutable ops are Swarm's blood cells
 * [Replicas](replica.md) - database replicas, full and partial
 * [Handshakes](handshake.md) - how sync sessions start and end
+    * [Peer-to-peer handshakes](peer_handshake.md) - for full database replicas
+    * [Client handshakes](client_handshake.md) - for clients, to connect to a database
+    * [Object handshakes](object_handshake.md) - for clients, to fetch an object and subscribe to updates
 * [Replicated data types](rdt.md) - everything that can run on top of Swarm
 * [CRDT](crdt.md) - our beloved and precious Conflict-free replicated data types
 
