@@ -1,7 +1,6 @@
 # Table of Contents
 
-* [Table of Contents](SUMMARY.md)
-* [Introduction](README.md) - this document
+* [Table of Contents](SUMMARY.md) - this document
 * [Base64x64 numbers](64x64.md) - our sacred serialization format
 * [Stamps](stamp.md) - event/object ids for a distributed system
 * [Specifiers](spec.md) - compound event... descriptors
