@@ -1,4 +1,4 @@
-# Summary
+# Table of Contents
 
 * [Introduction](README.md)
 * [Base64x64 numbers](64x64.md) - our sacred serialization format
