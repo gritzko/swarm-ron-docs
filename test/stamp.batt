@@ -1,0 +1,36 @@
+; zero (is-zero: true), named zero
+0
+0+my
+
+; is-transcendent: true
+transcndnt
+
+; never, named never
+~
+~+my
+
+; parent-of true
+1CQAneD+parnt
+1CQAnek+parntsCHILD
+
+; 1 Jan 2010 00:00:01 UTC
+000001+my
+
+; Fri May 27 20:50:00 UTC 2016: scan and print both formats
+1CQAn+my
+Fri May 27 20:50:00 UTC 2016
+
+; parse 1CQAn00000+my: the same timestamp untrimmed
+Fri May 27 20:50:00 UTC 2016
+
+; is-abnormal: true (not a timestamp)
+~abc+author
+
+; is-transcendent: true (the right half is not an origin)
+Object+~3
+
+; parse Object+0: zero origin is skipped, transcendent: true
+Object
+
+; is-error: true, is-transcendent: false, is-abnormal: true, is-zero: false
+~~~~~~~~~~+origin
