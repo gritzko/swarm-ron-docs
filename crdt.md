@@ -1,7 +1,7 @@
 # CRDT - Replicated Data Types
 
 Wikipedia has a generally good [introductory article][wiki] on CRDTs.
-Conflict-free replicated data types are subdivided into two main subtypes: op-based C**m**RDT and state-based C**v**RDT.
+Conflict-free replicated data types are subdivided into two main subtypes: op-based Commutative (C**m**RDT) and state-based Convergent (C**v**RDT).
 CvRDT was originally defined in terms of merging state snapshots.
 CmRDT was defined in terms of applying atomic ops to the state.
 
@@ -57,7 +57,7 @@ Some less-severe issues remain:
 * deltas are mutable, and
 * objects still carry metadata for state-to-state merge.
 
-In our opinion, the main deficiency of CvRDT is also architectural.
+The main deficiency of CvRDT is also architectural.
 There is no clear separation of concerns between the transport/broadcast layer and the CRDT/math layer.
 They entangle.
 
