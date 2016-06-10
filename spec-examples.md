@@ -1,6 +1,4 @@
-## Protocol 1.1.0-pre
-
-Common message spec examples
+# Common message spec examples #
 
 ### Subscriptions
 
