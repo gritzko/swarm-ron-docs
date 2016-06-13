@@ -7,7 +7,7 @@ Swarm stamps are pairs of 64-bit numbers:
 * a variable-precision timestamp and
 * a replica id.
 
-Stamps are serialized to [Base64x64](64x64.md) using `+` as a separator, e.g. `1CQAneD1+X~` (time `1CQAneD1`, replica id `X~`).
+Stamps are serialized to [Base64x64](64x64.md) using `+` as a separator, e.g. `1CQKneD1+X~` (time `1CQKneD1`, replica id `X~`).
 Replica id may be empty (numerically, 0) for transcendent values.
 Those are global constants that are precisely defined mathematically, hence independent of any origin or time. 
 
@@ -18,7 +18,7 @@ In Base64x64, variable-precision timestamps have the `MMDHmSssnn` format.
 Ten Base64 chars encode months-since-epoch, days, hours, minutes, seconds, milliseconds and an additional sequence number.
 The resulting resolution is ~4mln timestamps per second.
 That is often excessive, so it is OK to use shorter timestamps.
-For example, `1CQAneD` (7 chars) or `1CQAn` (5 chars, `MMDHm`, no seconds - Fri May 27 20:50:00 UTC 2016).
+For example, `1CQKneD` (7 chars) or `1CQKn` (5 chars, `MMDHm`, no seconds - Fri May 27 20:50:00 UTC 2016).
 Swarm epoch date is 1 Jan 2010 00:00:00 UTC (Unix epoch plus 1262304000000 ms).
 
 Replica ids are hierarchical, typically having three parts: peer replica (server) id bits, user id bits and session id bits.
