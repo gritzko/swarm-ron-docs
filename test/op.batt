@@ -1,0 +1,18 @@
+; empty-value op
+/Swarm#database!0.on
+
+; single line value op
+/Object#1CQZ38+Y~!1CQa4+Xusernm1Q.NumbrField 123
+
+; multiline op (chekc defaults, same object)
+/Swarm#database!1CQAneD1+X~.~
+    !1CQAneD+X~.Access OwnWriteAllRead
+    !1CQAneD1+X~.ReplicaIdScheme 163
+!1CQa5+Xusernm1Q.Multiline
+    First line
+    Second line
+        Indented third line
+
+; explicit length op
+!1CQa6+Xusernm1Q.Buffer=A
+raw buffer

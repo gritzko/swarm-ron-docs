@@ -1,0 +1,17 @@
+; zero spec (noop)
+/0#0!0.0
+
+; read-only subscription, all transcendents
+/Object#id!~.on
+
+; initial state (normalize the tailing 0)
+/Object#1CQAn+author!1CQAn0+author.~
+
+; defaults - all same object
+/Object#1CQAn+author!1CQAn0+author.~
+!1CQk5+author.field
+.on
+
+; no defaults - fill missing tokens with error values; is-error: true
+/Type.op
+/Type#~~~~~~~~~~!~~~~~~~~~~.op
