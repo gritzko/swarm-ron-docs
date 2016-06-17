@@ -60,12 +60,12 @@ Single line value:  spec HT value LF
 
     /Object#1CQZ38+Y~!1CQa4+Xusernm1Q.NumbrField 123
 
-Multiline value:  spec LF ( HT line LF ) *
+Multiline value:  spec = LF ( HT line LF ) *
 
-    /Swarm#database!1CQAneD1+X~.~
+    /Swarm#database!1CQAneD1+X~.~=
         !1CQAneD+X~.Access OwnWriteAllRead
         !1CQAneD1+X~.ReplicaIdScheme 163
-    !1CQa5+Xusernm1Q.Multiline
+    !1CQa5+Xusernm1Q.Multiline=
         First line
         Second line
             Indented third line
