@@ -1,17 +1,17 @@
 ; empty-value op
-/Swarm#database!0.on
+/Swarm#database.on
 
 ; single line value op
-/Object#1CQZ38+Y~!1CQa4+Xusernm1Q.NumbrField 123
+/Object#1CQZ38+Y~!1CQa4+Xusernm1Q.NumbrField	123
 
 ; multiline op (check defaults, same object, \n\n termination)
 /Swarm#database!1CQAneD1+X~.~=
-    !1CQAneD+X~.Access OwnWriteAllRead
-    !1CQAneD1+X~.ReplicaIdScheme 163
+	!1CQAneD+X~.Access OwnWriteAllRead
+	!1CQAneD1+X~.ReplicaIdScheme 163
 !1CQa5+Xusernm1Q.Multiline=
-    First line
-    Second line
-        Indented third line
+	First line
+	Second line
+		Indented third line
 
 
 ; explicit length op
