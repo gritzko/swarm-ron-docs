@@ -17,3 +17,11 @@ A good RDT must have:
 2. proof of correctness,
 3. test cases consisting of op sequences and resulting states (preferably concurrent cases too)
 4. ideally, JavaScript, C++ and Java implementations.
+
+Each RDT type has an unique [*transcendent*](stamp.md) id.
+That is a single Base64x64 number, which is typically human-readable.
+For example, `Counter`.
+Hence, every [spec](spec.md) of every [op](op.md) of a [Counter](types/counter.md) object starts with `/Counter`.
+The other half of the type id is either empty (default) or abnormal.
+
+Abnormal halves are used to convey [type parameters](type-params.md), e.g. `/Counter+~x`.
