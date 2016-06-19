@@ -8,7 +8,7 @@ The meaning of type-specific parameters is fully given in the type definition an
 
 The general convention for type parameter use is `~aTcTTTTTT`, where
 
-* `~` is the abnormal-value mark (no regular timestamps or replica ids start with '~'); type parameters reuse the origin part of the type id [stamp](stamp.md), hence the abnormal-value mark;
+* `~` is the [abnormal-value mark](stamp.md); type parameters reuse the origin part of the type id [stamp](stamp.md), hence the mark is necessary;
 * `a` is access mode bits; by convention, 6 bits are used as `rwRWst`, where
     1. `rw` is the author-access mode (read and write bits)
     2. `RW` is "friend" access mode (read, write)

@@ -9,7 +9,7 @@ Swarm stamps are pairs of 64-bit numbers:
 
 Stamps are serialized to [Base64x64](64x64.md) using `+` as a separator, e.g. `1CQKneD1+X~` (time `1CQKneD1`, replica id `X~`).
 Replica id may be empty (numerically, 0) for transcendent values.
-Those are global constants that are precisely defined mathematically, hence independent of any origin or time. 
+Those are global constants that are precisely defined mathematically, hence independent of any origin or time.
 
 Swarm timestamps are based on the Gregorian calendar and not milliseconds-since-epoch because they are [hybrid][hybrid] (logical, calendar-aware).
 Intuitive understanding of timestamps is more important for us than easy calculation of time intervals.
@@ -25,6 +25,15 @@ Replica ids are hierarchical, typically having three parts: peer replica (server
 For example, in the 1-6-3 scheme, replica id `Xgritzk0_D` has server id `X`, user id `gritzk` and session id `0_D`.
 The replica id scheme is mentioned in the database meta object (`163`, `262` etc).
 In some schemes, a client can fork off its own secondary client replicas.
+
+By convention, no regular timestamps or replica ids start with '~'.
+Such values are considered *abnormal*, e.g.
+* `~` is the name for the op carrying the state snapshot,
+* `~` is the timestamp for "never",
+* `!~.on` is a negative-acknowledgement ("I will never read from you"),
+* `~~~~~~~~~~` is simply "error value",
+* [type parameters](type-params.md) are abnormal origin values,
+* etc etc. 
 
 Philosophically, Swarm event/entity identifiers are based on a product of two very basic models: Lamport timestamps and process trees.
 It is like sequential processes (replicas) exchanging messages asynchronously AND those processes can fork off child replicas.
