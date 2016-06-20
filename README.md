@@ -1,4 +1,4 @@
-# The Swarm Protocol 1.1.1-pre #
+# The Swarm Protocol 1.2.0 #
 [*also on GitBooks: PDF, ebook, etc*](https://gritzko.gitbooks.io/swarm-the-protocol/content/SUMMARY.html)
 
 Swarm is a protocol for partially-ordered-op-log-based synchronization to support a massively replicated eventually consistent database.
