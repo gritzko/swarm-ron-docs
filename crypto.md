@@ -27,7 +27,12 @@ The hashed content is:
 A signature pseudo-op follows the hash pseudo op.
 The default signature method is 2048-bit DSA, serialized as 343 Base64x64 chars (the first char only uses lower 2 bits, 343*6-2048=4 bits are idle).
 The pseudo-op name is `.~sig`.
-The signature signs the value of the preceding hash message (i.e. 40 chars of the hash).
+The signed content is the value of the preceding hash op (i.e. 40 chars of the hash).
+In-transit signature checks are generally OPTIONAL.
+A peer MUST check the signature if
+
+* an op is received from the client
+* the type parameters signal a mandatory signature.
 
 ## Examples
 
