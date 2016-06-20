@@ -17,8 +17,8 @@ The general convention for type parameter use is `~aTcTTTTTT`, where
     1. `h` mandatory chain hashing bit
     2. `s` mandatory op signatures bit
     3. `HH` hashing algorithm (default is is SHA-256 truncated to 240 bits)
-    4. `SS` signature algorithm (default, 1024 bit DSA)
+    4. `SS` signature algorithm (default, 2048 bit DSA)
 
 For example, `/Counter+~x` means the author and friends can both read and write this [counter](types/counter.md), others can not. No crypto required.
 
-`/Counter+~x33` means a counter can only incremented by one, every op must be DSA signed and SHA-256 [Merkle chain-hashed](merkle.md). This must be a really important counter then.
+`/Counter+~x33` means a counter can only incremented by one, every op must be DSA signed and SHA-256 [Merkle chain-hashed](crypto.md). This must be a really important counter then.

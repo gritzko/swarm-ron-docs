@@ -1,4 +1,4 @@
-# Merkle hash chain
+# Crypto primitives
 
 The Swarm protocol provides rather strong delivery guarantees (exactly once, no causal reordering).
 Still, the raw protocol itself does not protect against Byzantine faults, bit flips, silent corruption.
@@ -22,8 +22,14 @@ The hashed content is:
 * the op serialized in the [text format](op.md), empty, single-line or explicit-length, not multiline.
 * the hash of the previous op, as an op in the text format, single-line, abbreviated.
 
+## Signatures
 
-## Examples.
+A signature pseudo-op follows the hash pseudo op.
+The default signature method is 2048-bit DSA, serialized as 343 Base64x64 chars (the first char only uses lower 2 bits, 343*6-2048=4 bits are idle).
+The pseudo-op name is `.~sig`.
+The signature signs the value of the preceding hash message (i.e. 40 chars of the hash).
+
+## Examples
 
 Original op:
 
