@@ -1,6 +1,6 @@
 # Type parameters
 
-The origin half of the type id is used to convey type parameters.
+The second half of the [type id](spec.md) is used to convey type parameters.
 Those can be generic or type-specific parameters.
 
 The meaning of generic parameters may depend on database options.

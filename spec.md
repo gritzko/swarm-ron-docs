@@ -4,9 +4,9 @@ A "specifier" is a compound identifier for an immutable op.
 The term itself is liberally borrowed from linguistics.
 A specifier consists of four tokens:
 
-* CRDT data *type* name,
+* *type*, a replicated data type id,
 * object *id* (typically, object id is a creation [stamp](stamp.md)),
-* the operation's globally unique *stamp*,
+* *stamp* (a globally unique timestamp, which is the [operation's](op.md) own identifier),
 * the *name* of the operation.
 
 Strictly speaking, the stamp alone uniquely identifies an op.
