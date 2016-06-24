@@ -1,72 +1,94 @@
 # Crypto primitives
 
 The Swarm protocol provides rather strong delivery guarantees (exactly once, no causal reordering).
-Still, the raw protocol itself does not protect against Byzantine faults, bit flips, silent corruption.
-To address that, a Swarm replica MAY employ crypto: Merkle hash chains and signatures.
+Still, the raw protocol itself does not protect against Byzantine faults and silent silent corruption.
+But, the very nature of immutable operations enables rich data integrity mechanics.
 
-## Hash chains
+The range of available options spans from simple causality information to mandatory data hashing to massively redundant data cross-signing.
+Swarm can be ran both as a federated database and as an [open super-peer network](peerage.md).
+The likely absence of single central authority makes the data integrity toolset vital.
 
-A hash chain guarantees that no ops have been withdrawn from a sequence or corrupted in transit.
-All hashed ops issued by a replica form a single Merkle chain.
-There is no possibility to provide finer grained (e.g. per-object) hash chains at the protocol level.
-The need of hash chaining is signaled in [type parameters](type-params.md).
+Swarm crypto is different from blockchain based solutions as it does not rely on proof-of-work and miners, but instead resorts to peer reputations.
+In the most strict setup, a single trustworthy peer can guarantee the integrity of the entire database.
+The BitCoin/Ethereum story shows that we can not avoid having reputable system custodians anyway.
+So the key design question was: do reputations suffice?
+Isn't the proof-of-work link unnecessary?
+The answer is mostly yes.
 
-A hash pseudo-op is transmitted immediately after its original [op](op.md).
-Its [specifier](spec.md) is exactly like the op's, except the op name is `.~hash`.
-A replica is REQUIRED to check a hashed op with its hash once the op is received, before any further processing.
-In case of hash mismatch, the op MUST be dropped and the connection MUST be severed.
+Swarm crypto model is must closer to git than to blockchain.
+Swarm crypto allows any participant to sign all the visible data.
+That compounds because peers and clients unavoidably cross-sign each other's signatures.
+Hence, the past information can not be possibly altered as long as at least one signatory is not compromised.
 
-The default hashing scheme is SHA-256.
-The hash is truncated to 240 bits and serialized as 40 [Base64x64](64x64.md) chars.
-The hashed content is:
-* the op serialized in the [text format](op.md), empty, single-line or explicit-length, not multiline.
-* the hash of the previous op, as an op in the text format, single-line, abbreviated.
+## Rolling hashes
+
+A rolling hash chain guarantees that no ops have been withdrawn from a sequence or corrupted in transit.
+Such a hash chain can be defined for any linear op sequence:
+
+* single replica op log (includes all ops created and stamped by the replica),
+* peer op log (included all the ops by the peer's clients in their arrival order) and
+* single-origin object op log (ops of a single replica over a single object).
+
+A rolling hash is defined irrespectively of whether it is mentioned explicitly in the respective op log.
+
+
+Swarm employs SHA-256 hashes truncated to 240 bits, serialized as 40 Base64 numbers (no tailing zero truncated, except for the default 0 value).
+
+A rolling hash at position `0` (no ops) is all zeroes (written `0`).
+A rolling hash at position `X` is a hash of:
+* the rolling hash at the previous position (40 bytes)
+* the op at position `X` in the [binary form](op.md) (8*2*4=64 bytes for the spec, 4 bytes for the size, then the value)
+
+The binary for is chosen because it is the least ambiguous and has no variants of representation (like optional tailing zeros or alternative serializations).
+A rolling hash can be added to the op log using the [noop op](noop.md), op name `.0`.
+The fact of mentioning the rolling hash on the log changes the log's rolling hash.
+The type of the rolling hash (replica, peer or object) can be derived from the stamp and type-id of the noop:
+* peer rolling hash is stamped with the peer's timestamp (e.g. `/Swarm#database!time+XY.0` in the 0*2*5*3 [replica id scheme](replica.md)),
+* replica's rolling hash is stamped with the replica's stamp (`/Swarm#database!time+XYauserSsn.0`),
+* single-origin object rolling hash has the type and the id of the hashed object (`/Object#created+author!time+XYauserSsn.0`).
+
+(Fine detail: A peer can edit and sign the [meta object](meta.md) using its [pocket session](pocket.md), hence metadata's object hashes differ from full-database log hashes by the origin of the stamp.)
+
+Note that a rolling hash needs no full recalculation (the full history may not even be available); it is calculated incrementally, op by op.
+In case an op log starts with a state snapshot, a rolling hash can be provided by a same-type, same-id, same-stamp noop immediately following the state snapshot.
+
+As a noop has an unique timestamp, it can be referenced.
+Essentially, it is a building block for higher-order constructs that allows to prove the integrity of the causal past if any event.
+
+The need of creating and checking rolling hashes is signaled in
+* [type parameters](type-params.md) for separate data types or
+* in the type parameters of the database, for all types.
+
+## Causal links
+
+Many important op sequences are not linear, but partially ordered.
+Namely, arrival orders at different replicas may vary: concurrent ops can go in
+different orders.
+To entangle different linear sequences into a proper causal [cone of the past][minkowski], Swarm employs causal links.
+Namely, a noop can cite a rolling hash of one sequence in the other sequence, thus linking two sequences cryptographically.
+It is recommended to always cite explicit hashes (i.e. those mentioned in existing noops), albeit it is possible to cite an implicit hash (not mentioned in a noop, but derived from the sequence directly).
+
+Causal links enable:
+
+* full-swarm full-database op log hashes (made by peers),
+* client hashes (made by linking all the client's sessions) and
+* object op log hashes (for the full op log of an object).
+
+The need for causal linking is signaled in type parameters.
+
+
+[minkowski]: https://en.wikipedia.org/wiki/Light_cone
 
 ## Signatures
 
-A signature pseudo-op follows the hash pseudo op.
-The default signature method is 2048-bit DSA, serialized as 343 Base64x64 chars (the first char only uses lower 2 bits, 343*6-2048=4 bits are idle).
-The pseudo-op name is `.~sig`.
-The signed content is the value of the preceding hash op (i.e. 40 chars of the hash).
+What can be hashed can be signed too.
+Noops can contain signatures put by their author replicas.
+The default algorithm is DSA, 2048 bits.
+Signatures are serialized as 54 Base64 chars (higher 4 bits of the first char are zeros).
+Public keys for each replica are listed in the replica's meta object `/Replica#0+ReplId`.
+
 In-transit signature checks are generally OPTIONAL.
 A peer MUST check the signature if
 
 * an op is received from the client
 * the type parameters signal a mandatory signature.
-
-## Examples
-
-Original op:
-
-    /Object+~x02#1CQZ38+Y~!1CQa4+Xusernm1Q.NumbrField    123
-
-Hashed content (there is no previous op):
-
-    /Object+~x02#1CQZ38+Y~!1CQa4+Xusernm1Q.NumbrField    123
-    !0.~hash    0
-
-Hence, the hash is:
-
-    dc11a469d1fd1d1c3817e928119ce97b494470185e637158b2656e34651a46e0
-
-Then, the hash op is:
-
-    /Object+~x02#1CQZ38+Y~!1CQa4+Xusernm1Q.~hash SmQ4eTVDT13tNEIdH9EuwKK_lH5jZNL8nbMUp6HQ
-
-The next hashed op would probably be:
-
-    /Object+~x02#1CQZ38+Y~!1CQa5+Xusernm1Q.NumbrField    345
-
-its hashed content:
-
-    /Object+~x02#1CQZ38+Y~!1CQa5+Xusernm1Q.NumbrField    345
-    !1CQa4+Xusernm1Q.~hash    SmQ4eTVDT13tNEIdH9EuwKK_lH5jZNL8nbMUp6HQ
-
-Its hash is:
-
-    /Object+~x02#1CQZ38+Y~!1CQa5+Xusernm1Q.~hash    f_77ABq5718VLMNguOFMcW~eg2MzKVSivQ7ttF9d    
-
-Hence, it must be sent on the wire as:
-
-    /Object+~x02#1CQZ38+Y~!1CQa5+Xusernm1Q.NumbrField    345
-    .~hash    f_77ABq5718VLMNguOFMcW~eg2MzKVSivQ7ttF9d    

@@ -17,6 +17,7 @@ In the same scheme, a peer has an identifier of 2 chars, and that identifier cor
 ## Primuses
 
 Primuses is an optional layer of "true" peers, mostly meaningful in dynamic-membership networks.
+The term is borrowed from the Latin formula `primus inter pares`.
 Primuses must all recognize each other, e.g. cryptographically sign each other's signatures.
 Any primus MUST be able to connect to any other primus any time, should the need arise.
 Primuses may introduce new peers that can connect to any other peers.
