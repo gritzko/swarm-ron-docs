@@ -15,7 +15,7 @@ So the key design question was: do reputations suffice?
 Isn't the proof-of-work link unnecessary?
 The answer is mostly yes.
 
-Swarm crypto model is must closer to git than to blockchain.
+Swarm crypto model is much closer to git than to blockchain.
 Swarm crypto allows any participant to sign all the visible data.
 That compounds because peers and clients unavoidably cross-sign each other's signatures.
 Hence, the past information can not be possibly altered as long as at least one signatory is not compromised.
@@ -32,7 +32,7 @@ Such a hash chain can be defined for any linear op sequence:
 A rolling hash is defined irrespectively of whether it is mentioned explicitly in the respective op log.
 
 
-Swarm employs SHA-256 hashes truncated to 240 bits, serialized as 40 Base64 numbers (no tailing zero truncated, except for the default 0 value).
+Swarm employs truncated SHA-256 hashes serialized as 40 Base64 numbers (the tailing 16 bits of SHA-256 are skipped, the default all-zero value is written as `0`).
 
 A rolling hash at position `0` (no ops) is all zeroes (written `0`).
 A rolling hash at position `X` is a hash of:
