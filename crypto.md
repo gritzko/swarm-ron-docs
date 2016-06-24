@@ -36,6 +36,7 @@ Swarm employs truncated SHA-256 hashes serialized as 40 Base64 numbers (the tail
 
 A rolling hash at position `0` (no ops) is all zeroes (written `0`).
 A rolling hash at position `stamp+X` is a SHA hash of:
+
 * the rolling hash at the previous position (40 bytes)
 * the op at position `stamp+X` in the [binary form](op.md) (8*2*4=64 bytes for the spec, 4 bytes for the size, then the value)
 
@@ -43,11 +44,11 @@ The binary for is chosen because it is the least ambiguous and has no variants o
 A rolling hash can be added to the op log using the [noop op](noop.md), op name `.0`.
 The fact of mentioning the rolling hash on the log changes the log's rolling hash.
 The type of the rolling hash (replica, peer or object) can be derived from the stamp and type-id of the noop:
-* peer rolling hash is stamped with the peer's timestamp (e.g. `/Swarm#database!time+XY.0` in the 0*2*5*3 [replica id scheme](replica.md)),
+* peer rolling hash is stamped with the peer's own timestamp (e.g. `/Swarm#database!time+XY.0` in the 0*2*5*3 [replica id scheme](replica.md)),
 * replica's rolling hash is stamped with the replica's stamp (`/Swarm#database!time+XYauserSsn.0`),
 * single-origin object rolling hash has the type and the id of the hashed object (`/Object#created+author!time+XYauserSsn.0`).
 
-(Fine detail: A peer can edit and sign the [meta object](meta.md) using its [pocket session](pocket.md), hence metadata's object hashes differ from full-database log hashes by the origin of the stamp.)
+(Fine detail: A peer can edit and sign the [meta object](meta.md) using its [pocket session](pocket.md), so metadata's object hashes differ from full-database log hashes by the origin of the stamp.)
 
 Note that a rolling hash needs no full recalculation (the full history may not even be available); it is calculated incrementally, op by op.
 In case an op log starts with a state snapshot, a rolling hash can be provided by a same-type, same-id, same-stamp noop immediately following the state snapshot.
@@ -65,8 +66,9 @@ Many important op sequences are not linear, but partially ordered.
 Namely, arrival orders at different replicas may vary: concurrent ops can go in
 different orders.
 To entangle different linear sequences into a proper causal [cone of the past][minkowski], Swarm employs causal links.
-Namely, a noop can cite a rolling hash of one sequence in the other sequence, thus linking two sequences cryptographically.
-It is recommended to always cite explicit hashes (i.e. those mentioned in existing noops), albeit it is possible to cite an implicit hash (not mentioned in a noop, but derived from the sequence directly).
+Namely, a noop can reference a rolling hash of one sequence in the other sequence, thus linking two sequences cryptographically.
+It is recommended to always reference explicit hashes (i.e. those mentioned in existing noops).
+Albeit, it is possible to reference an implicit hash, i.e. one not mentioned in a noop, but derived from the sequence directly.
 
 Causal links enable:
 
