@@ -1,7 +1,7 @@
 # Crypto primitives
 
 The Swarm protocol provides rather strong delivery guarantees (exactly once, no causal reordering).
-Still, the raw protocol itself does not protect against Byzantine faults and silent silent corruption.
+Still, the raw protocol itself does not protect against Byzantine faults and silent data corruption.
 But, the very nature of immutable operations enables rich data integrity mechanics.
 
 The range of available options spans from simple causality information to mandatory data hashing to massively redundant data cross-signing.
@@ -12,18 +12,18 @@ Swarm crypto is different from blockchain based solutions as it does not rely on
 In the most strict setup, a single trustworthy peer can guarantee the integrity of the entire database.
 The BitCoin/Ethereum story shows that we can not avoid having reputable system custodians anyway.
 So the key design question was: do reputations suffice?
-Isn't the proof-of-work link unnecessary?
+May the proof-of-work part turn unnecessary?
 The answer is mostly yes.
 
 Swarm crypto model is much closer to git than to blockchain.
 Swarm crypto allows any participant to sign all the visible data.
-That compounds because peers and clients unavoidably cross-sign each other's signatures.
+That effect compounds, because peers and clients unavoidably cross-sign each other's signatures.
 Hence, the past information can not be possibly altered as long as at least one signatory is not compromised.
 
 ## Rolling hashes
 
 A rolling hash chain guarantees that no ops have been withdrawn from a sequence or corrupted in transit.
-Such a hash chain can be defined for any linear op sequence:
+Such a hash chain can be defined for any linear op sequence, such as:
 
 * single replica op log (includes all ops created and stamped by the replica),
 * peer op log (included all the ops by the peer's clients in their arrival order) and
@@ -35,9 +35,9 @@ A rolling hash is defined irrespectively of whether it is mentioned explicitly i
 Swarm employs truncated SHA-256 hashes serialized as 40 Base64 numbers (the tailing 16 bits of SHA-256 are skipped, the default all-zero value is written as `0`).
 
 A rolling hash at position `0` (no ops) is all zeroes (written `0`).
-A rolling hash at position `X` is a hash of:
+A rolling hash at position `stamp+X` is a SHA hash of:
 * the rolling hash at the previous position (40 bytes)
-* the op at position `X` in the [binary form](op.md) (8*2*4=64 bytes for the spec, 4 bytes for the size, then the value)
+* the op at position `stamp+X` in the [binary form](op.md) (8*2*4=64 bytes for the spec, 4 bytes for the size, then the value)
 
 The binary for is chosen because it is the least ambiguous and has no variants of representation (like optional tailing zeros or alternative serializations).
 A rolling hash can be added to the op log using the [noop op](noop.md), op name `.0`.

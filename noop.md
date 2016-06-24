@@ -29,7 +29,7 @@ A *referenced hash* is a rolling hash from another sequence; a noop references i
 A joint hash is a hash of a 80-char concatenation of:
 
 1. the rolling hash of our sequence and
-2. the cited hash of another sequence.
+2. the referenced hash of another sequence.
 
 For example, in a 101 pattern noop, we reference an op from another sequence, then we sign the joint hash.
 It is generally recommended to reference noops, not just regular ops.
@@ -42,5 +42,5 @@ When we reference any other op, we reference the rolling hash *calculated* from 
 If the referenced noop has an implicit hash (it is not mentioned), we must take the rolling hash from the immediate preceding op of that sequence.
 
 A 0xx pattern noop MAY share the stamp with the preceding op, in case both the op and the noop are created by the same replica.
-That way, the noop will not afffect version ids or version vectors.
+That way, the noop will not change version ids or version vectors.
 In such a case, both definitions for the referenced hash match, as the noop mentions the rolling hash of the preceding op.
