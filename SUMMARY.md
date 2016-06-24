@@ -12,4 +12,5 @@
     * [Object handshakes](object_handshake.md) - for clients, to fetch an object and subscribe to updates
 * [Replicated data types](rdt.md) - everything that can run on top of Swarm
 * [CRDT](crdt.md) - our beloved and precious Conflict-free replicated data types
-
+* [Crypto](crypto.md) - Swarm data integrity machinery
+    * [Causality/integrity tracking](noop.md) - all-powerful noops
