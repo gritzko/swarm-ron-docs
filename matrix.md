@@ -46,7 +46,7 @@ We use peer [full-swarm signed rolling hashes](crypto.md) delivered as [noops](n
     /Swarm#database!3+B.0 2+A HASH SIGNATURE
 
 On every entangling noop, we add it to the matrix.
-We also continue by adding recursively any past noops it further entangles (i.e. 3+B entangles 2+A and 1+C).
+We also continue by adding recursively any past noops it further entangles (i.e. 3+B entangles 2+A for C and 1+C for A).
 
 The entanglement matrix can answer various queries.
 For example, we may see which peer's ops are certainly known to everyone already: 2+A, 3+B, 1+C.
