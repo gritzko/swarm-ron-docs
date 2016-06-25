@@ -22,7 +22,7 @@ Suppose, three peers (A, B and C) each generated three signed noops at different
 * C at 1, 4 and 5.
 
 Peers are connected in a chain A-B-C.
-Op propagation causality diagram is like this:
+The following causality diagram reflects both op propagation and cryptographic entanglement of those noops:
 
     A -1-2---4---
           \ /
@@ -31,7 +31,8 @@ Op propagation causality diagram is like this:
     C -1-----4-5-
 
 For example, A has seen 3+B, but not 5+B yet.
-C has seen 2+A, as it was relayed just before 3+B.
+C has seen 2+A, as it was relayed by B just before 3+B.
+3+B *entangles* 2+A and 1+C, as it signs a [Merkle tree][merkle] that has both those ops.
 
 The entanglement matrix reflects which peer's noop the other peer has already seen (horizontal: senders, vertical: observers).
 
@@ -60,3 +61,4 @@ Note that the client does not need the full log or the full entanglement matrix.
 The quorum proof can be made with a segment of the op log, in both cases.
 
 [mc]: https://en.wikipedia.org/wiki/Matrix_clock
+[merkle]: https://en.wikipedia.org/wiki/Merkle_tree
