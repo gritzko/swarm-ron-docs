@@ -14,3 +14,5 @@
 * [CRDT](crdt.md) - our beloved and precious Conflict-free replicated data types
 * [Crypto](crypto.md) - Swarm data integrity machinery
     * [Causality/integrity tracking](noop.md) - all-powerful noops
+    * [Entanglement matrix](matrix.md) - like blockchain, but uses
+      distributed math (not linear)
