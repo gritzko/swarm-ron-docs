@@ -50,12 +50,12 @@ We also continue by adding recursively any past noops it further entangles (i.e.
 
 The entanglement matrix can answer various queries.
 For example, we may see which peer's ops are certainly known to everyone already: 2+A, 3+B, 1+C.
-We may see, which ops are certainly known to a quorum/majority of peers (two in our case): 2+A, 3+B, 4+C.
+We may see which ops are known to a majority of peers: 2+A, 3+B, 4+C.
 
 A client replica may need one additional step to use an entanglement matrix.
 Namely, it has to link the op of interest to the nearest home peer's noop.
 Practically, that is a hash chain validation.
-Once a client can see that the op is covered by a certain peer's noop, it may track the progress of the entanglement matrix till it shows majority acceptance of the op (for example).
+Once a client can see that the op is covered by a home peer's noop, it may track the progress of the entanglement matrix till it shows majority acceptance of the op in question.
 Note that the client does not need the full log or the full entanglement matrix.
 The quorum proof can be made with a segment of the op log, in both cases.
 
