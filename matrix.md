@@ -8,7 +8,7 @@ Once the attacker sends out contradictory ops, that creates a swarm split-brain.
 Unless the swarm is physically permanently separated, the contradiction will be detected as soon as both versions of reality are known to all peers.
 Still, there is a window of opportunity for the duration of the split-brain.
 
-The entanglement matrix is a dynamic cryptographic construct that ensures that all peers see the same, without any global linearization or blockchains.
+The entanglement matrix is a cryptographic construct that ensures that all peers see the same, without any global linearization or blockchains.
 
 As such, it limits the duration of undetected split-brains.
 Ultimately, it allows to wait out the uncertainty: once all peers will accept the op, we will see that from the matrix.
@@ -41,7 +41,7 @@ The entanglement matrix reflects which peer's noop the other peer has already se
     B   2   5   4
     C   2   3   5
 
-Essentially, an entanglement matrix is a cryptographically signed [matrix clock][mc].
+Essentially, an entanglement matrix is a cryptographically hardened [matrix clock][mc].
 We use peer [full-swarm signed rolling hashes](crypto.md) delivered as [noops](noop.md), e.g.
 
     /Swarm#database!3+B.0 2+A HASH SIGNATURE
