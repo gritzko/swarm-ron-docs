@@ -32,7 +32,7 @@ The following causality diagram reflects both op propagation and cryptographic e
 
 For example, A has seen 3+B, but not 5+B yet.
 C has seen 2+A, as it was relayed by B just before 3+B.
-3+B *entangles* 2+A and 1+C, as it signs a [Merkle tree][merkle] that has both those ops.
+We say that 3+B *entangles* 2+A and 1+C, because it signs a [Merkle tree][merkle] that has both those ops.
 
 The entanglement matrix reflects which peer's noop the other peer has already seen (horizontal: senders, vertical: observers).
 
