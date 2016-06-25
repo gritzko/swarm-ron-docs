@@ -36,6 +36,10 @@ It is generally recommended to reference noops, not just regular ops.
 That way, we are talking about an explicitly mentioned hash.
 Otherwise, the referenced rolling hash will have to be derived.
 
+1x1 pattern noops essentially turn a Swarm op log into a cross-signed [Merkle tree][merkle].
+In such a tree, eventually, all peers may cross-sign all the data.
+On top of entangling noops, we may build advanced constructs, such as [entanglement matrix](matrix.md).
+
 Some fine details.
 When we reference a noop, we reference the hash *mentioned* in that op, not the rolling hash of the noop itself.
 When we reference any other op, we reference the rolling hash *calculated* from that op.
@@ -44,3 +48,5 @@ If the referenced noop has an implicit hash (it is not mentioned), we must take 
 A 0xx pattern noop MAY share the stamp with the preceding op, in case both the op and the noop are created by the same replica.
 That way, the noop will not change version ids or version vectors.
 In such a case, both definitions for the referenced hash match, as the noop mentions the rolling hash of the preceding op.
+
+[merkle]: https://en.wikipedia.org/wiki/Merkle_tree
