@@ -8,12 +8,11 @@ Once the attacker sends out contradictory ops, that creates a swarm split-brain.
 Unless the swarm is physically permanently separated, the contradiction will be detected as soon as both versions of reality are known to all peers.
 Still, there is a window of opportunity for the duration of the split-brain.
 
-The entanglement matrix is a dynamic cryptographic construct that lets a peer or a client see that the observed version of reality is actually shared by all the other peers (or at least the majority).
-It answers the question "do you see what I see?"
+The entanglement matrix is a dynamic cryptographic construct that ensures that all peers see the same, without any global linearization or blockchains.
 
 As such, it limits the duration of undetected split-brains.
 Ultimately, it allows to wait out the uncertainty: once all peers will accept the op, we will see that from the matrix.
-From that point on, the network's causality guarantees prevent any split-brain in regard to that op.
+From that point on, the protocol's causality guarantees prevent any split-brain from happening (in regard to that op).
 
 An entanglement matrix needs no other primitives but [signed noops](noop.md).
 
@@ -25,29 +24,29 @@ Suppose, three peers (A, B and C) each generated three signed noops at different
 Peers are connected in a chain A-B-C.
 Op propagation causality diagram is like this:
 
-A -1-2---4---
-      \ /
-B ---2-3---5-
-    /   \ /
-C -1-----4-5-
+    A -1-2---4---
+          \ /
+    B ---2-3---5-
+        /   \ /
+    C -1-----4-5-
 
 For example, A has seen 3+B, but not 5+B yet.
 C has seen 2+A, as it was relayed just before 3+B.
 
 The entanglement matrix reflects which peer's noop the other peer has already seen (horizontal: senders, vertical: observers).
 
-    A   B   C
-A   4   3   1
-B   2   5   4
-C   2   3   5
+        A   B   C
+    A   4   3   1
+    B   2   5   4
+    C   2   3   5
 
 Essentially, an entanglement matrix is a cryptographically signed [matrix clock][mc].
-We use peer all-log signed [rolling hashes](crypto.md) delivered as [noops](noop.md), e.g.
+We use peer [full-swarm signed rolling hashes](crypto.md) delivered as [noops](noop.md), e.g.
 
     /Swarm#database!3+B.0 2+A HASH SIGNATURE
 
 On every entangling noop, we add it to the matrix.
-We also continue by adding recursively any past noops it entangles (i.e. 3+B entangles 2+A and 1+C).
+We also continue by adding recursively any past noops it further entangles (i.e. 3+B entangles 2+A and 1+C).
 
 The entanglement matrix can answer various queries.
 For example, we may see which peer's ops are certainly known to everyone already: 2+A, 3+B, 1+C.
@@ -58,6 +57,6 @@ Namely, it has to link the op of interest to the nearest home peer's noop.
 Practically, that is a hash chain validation.
 Once a client can see that the op is covered by a certain peer's noop, it may track the progress of the entanglement matrix till it shows majority acceptance of the op (for example).
 Note that the client does not need the full log or the full entanglement matrix.
-The quorum proof can be made with a segment of the op log, in both cases. 
+The quorum proof can be made with a segment of the op log, in both cases.
 
 [mc]: https://en.wikipedia.org/wiki/Matrix_clock
