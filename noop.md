@@ -20,9 +20,9 @@ There are eight possible combinations of the three non-comment parts, hence 8 no
 * 010 an explicit rolling hash,
 * 011 a signature for an explicit rolling hash,
 * 100 causal link (to an operation from another sequence),
-* 101 causal link and a signature for the joint hash,
+* 101 implicit *entanglement*: a causal link and a signature for the joint hash,
 * 110 causal link and an explicit joint hash,
-* 111 signed explicit joint hash.
+* 111 explicit *entanglement*: signed explicit joint hash.
 
 If a rolling hash is "implicit", the recipient is supposed to have it already, so it is not mentioned.
 A *referenced hash* is a rolling hash from another sequence; a noop references it by its stamp (patterns 100-111).
