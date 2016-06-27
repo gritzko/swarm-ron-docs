@@ -53,6 +53,15 @@ The entanglement matrix can answer various queries.
 For example, we may see which peer's ops are certainly known to everyone already: 2+A, 3+B, 1+C.
 We may see which ops are known to a majority of peers: 2+A, 3+B, 4+C.
 
+Some closing remarks on scalability.
+
+Even in a super-peer network, the number of peers may be large.
+An entanglement matrix has a size of O(N^2), i.e. quadratic.
+The fact that we need such a big data structure may seem depressing at first.
+Practically, a regular peer or client hardly needs the full matrix.
+A replica may need to know which of *its own* ops are reliably disseminated.
+To answer that question, it needs one column from the matrix (and a little bit more to implement recursion, but O(N) anyway).
+
 A client replica may need one additional step to use an entanglement matrix.
 Namely, it has to link the op of interest to the nearest home peer's noop.
 Practically, that is a hash chain validation.
