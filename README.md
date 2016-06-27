@@ -40,10 +40,10 @@ The main focus is on op-based [CmRDTs](crdt.md#CmRDT).
 Swarm can support other constructs as well, such as state-based [CvRDT](crdt.md), logged asynchronous RPC and others, even [crypto coins](coin.md).
 
 An RDT replica can be described in the terms of the [state machine replication][smr] model.
-Swarm only uses data types that converge despite some possible op reordering of concurrent operations (i.e. concurrent ops commute).
+Swarm only uses data types that converge despite some possible reordering of concurrent operations (i.e. concurrent ops must commute).
 
 On the top of the RDT layer, there is a language-specific idiomatic API that hides all the op/state/metadata internals from the developer.
-The general concept of those APIs is that replicated data types must pretend to be simple local objects as much as possible.
+The general concept of those APIs is that replicated data types must pretend to be plain simple local objects as much as possible.
 All the synchronization must happen automagically.
 
 [smr]: https://www.cs.cornell.edu/fbs/publications/SMSurvey.pdf
@@ -60,11 +60,13 @@ A linear-log system can hardly be ran otherwise.
 Consequently, they save on the who-when-why metadata.
 
 Swarm *peers* connect to each other in an arbitrary fashion, the only requirement is that the graph should be connected most of the time.  
-*Clients* only connect to their *home* peers.
 Peers must keep a full database replica.
+*Clients* only connect to their *home* peers.
 Clients can pick their dataset on object-by-object basis.
 Client replicas are fully autonomous, can cache all the data locally and make writes while offline.
-Every Swarm op is attributed to its origin replica and immutable from the moment of creation (e.g. compare that to repeatedly-mutable [OT][ot] ops).
+
+Every Swarm op is timestamped and attributed to its origin replica.
+Ops are immutable from the moment of creation (e.g. compare that to repeatedly-mutable [OT][ot] ops).
 Ops propagate without causality violations.
 Practically, that means a replica can only relay ops in the order they were received (the *arrival* order).
 
@@ -77,7 +79,7 @@ That is the core of it: a replicated log service (and a key-value database on to
 
 ## The math
 
-Swarm employs a variety of classic computer science models: state machine replication, Lamport logical time.
+Swarm employs a variety of classic computer science models: state machine replication, Lamport logical time, sequential processes exchanging messages.
 It relies on TCP sequential delivery and log-structured database guarantees.
 
 The core contribution of the Swarm protocol is *practicality*.
