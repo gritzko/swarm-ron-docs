@@ -11,7 +11,7 @@ Still, there is a window of opportunity for the duration of the split-brain.
 The entanglement matrix is a cryptographic construct that ensures that all peers see the same, without any global linearization or blockchains.
 
 As such, it limits the duration of undetected split-brains.
-Ultimately, it allows to wait out the uncertainty: once all peers will accept the op, we will see that from the matrix.
+Ultimately, it allows to wait out the uncertainty: once enough peers accepted the op, we will see that from the matrix.
 From that point on, the protocol's causality guarantees prevent any split-brain from happening (in regard to that op).
 
 An entanglement matrix needs no other primitives but [signed noops](noop.md).
