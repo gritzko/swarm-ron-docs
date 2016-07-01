@@ -22,13 +22,13 @@ Highly scalable databases (e.g. Cassandra, Riak) tend to avoid total order.
 When a linear-order database (e.g. MySQL) is scaled up, it is typically *sharded*.
 In other words, they give up on the global linear order.
 
-Hidden is plain sight is the fact that the total linearization of all transactions is not actually needed for a crypto currency.
+Hidden in plain sight is the fact that the total linearization of all transactions is not actually needed for a crypto currency.
 The same way, it is not needed by any real-world currency, because unrelated transactions don't need to be ordered.
 A linear order is needed for a single *asset* that changes hands.
 It is also needed for an *agent* that trades assets.
 But not for the system as a whole.
 
-The choice of crypto currencies to go with global linearization can be only explained by their *global consensus* algorithms.
+The choice of crypto currencies to implement global linearization can be only explained by their *global consensus* algorithms.
 Probably, we should call that global *nonsensus*, because, again, no single actor in the system needs global consensus as such.
 Practically, given that we know a coin's owner, the only thing we need to know more is whether that owner gives it to us or to somebody else.
 The history and the state of any other asset is completely irrelevant, unless we speak of atomic transactions (exchange of several assets at once), which is a [separate topic][beilis].
@@ -47,7 +47,11 @@ Distributed systems need distributed math.
 > The distributed currency of Ethereum does not depend on any government or bank, but only on Vitalik Buterin.
 
 We generally assume a super-peer network architecture.
-A multi-level architecture may not satisfy some, but even de-jure flat networks (e.g. BitCoin) tend to have de-facto stratification (e.g. exchanges and top miners)
+A multi-level architecture may not satisfy some, but even de-jure flat networks (e.g. BitCoin) tend to have de-facto stratification (e.g. exchanges and top miners).
+Adam Smith-like economies of scale and specialization inevitably lead to the emergence of high-volume high-efficiency nodes.
+Complex networks tend to be hub-dominated.
+We don't want to argue with the nature.
+
 There are *peer* Swarm nodes and *client* Swarm nodes.
 Clients are only connected to their home peers.
 Peers control the validity of client's behavior.
@@ -131,7 +135,7 @@ And, as the saying goes, the best is the enemy of good enough.
 
 The described crypto-coin scheme is only formally a CRDT.
 Actually, it builds a linear history of a single coin transactions based on local linear op histories (sessions' own logs and peers' home logs).
-No global order or consensus ("nonsensus") is used.
+No global order or consensus is used.
 The underlying constructs are quite well known and well tested: the Lamport model, Merkle trees and others.
 The only (likely) novel part is the notion of split coin.  
 
