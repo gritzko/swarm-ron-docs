@@ -118,6 +118,7 @@ Hence, the term "split-coin": the value of the coin is literally split into part
 It is possible to pay with it, but only within some vicinity.
 It is like you have a dollar, but you can only pay on US Western coast, because in other parts of the world it belongs to somebody else.
 If you own that dollar in Sahara only, it hardly has any value at all.
+Technically, a split coin can be reconciled by buying all of its splits.
 
 The recipient's best strategy is to wait this uncertainty out.
 On receiving a coin, a client ensures that - even if some split will surface later - its domain is already big enough for all practical purposes.
