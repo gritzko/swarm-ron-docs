@@ -52,7 +52,7 @@ Adam Smith-like economies of scale and specialization inevitably lead to the eme
 Complex networks tend to be hub-dominated.
 We don't want to argue with the nature.
 
-There are *peer* Swarm nodes and *client* Swarm nodes.
+There are *peer* [Swarm replicas](replica.md) and *client* Swarm replicas.
 Clients are only connected to their home peers.
 Peers control the validity of client's behavior.
 Hence, only a peer can attempt a double-spend.
@@ -62,19 +62,22 @@ The only way of peer punishment is [severing peering links (eviction)](peerage.m
 
 ## Data model
 
-By building on the very classic Lamport distributed system model and [logical clocks][lamport] (1978), _we completely remove the need for distributed consensus and voting_: transactions are either (a) valid or (b) ignored.
+By building on the very classic Lamport distributed system model and [logical clocks][lamport] (1978), _we completely remove the need for distributed consensus and voting_.
+Transactions are either (a) valid or (b) ignored.
 Namely,
 
-* a coin is a Swarm object with an unique id (`/Coin#id`),
+* a coin is a Swarm object with an unique id (`/Coin#id`, see [specs](spec.md)),
 * the only coin op is the handover op `.pay` that mentions the next owner's replica id and public key  e.g. `/Coin#id!time+owner.pay new_owner NEW_OWNER_PUB_KEY`
-* the author [noop-signs](noop.md) a pay op with its key,
+* the author [noop-signs](noop.md) a pay op with its own key,
+* author's home peer must cross-sign the op with its own noop,
 * invalid ops are ignored,
 * the state of a coin object is the pair of replica id and public key of the coin's present owner,
 * lies are remembered (the coin is marked as disputed), but every replica sticks with the version that arrived first.
 
 We rely on "Lamport behavior" of processes to guarantee correctness.
-For example, a replica can only generate ops with monotonously increasing timestamps.
-That makes it impossible to rewrite an issued op: once a client that owns a coin creates a payment op, it is no longer able to pay that coin to somebody else.  
+For example, a replica can only generate totally ordered ops with monotonously increasing timestamps.
+Once a client that owns a coin emits a payment op, it is no longer able to pay that coin to somebody else in another op.
+The latter op will find that the owner has already changed.   
 The only attack possibility is for a peer to send different ops in different directions (see the split coin section).
 
 ## Crypto
@@ -95,11 +98,10 @@ Everything is cross-signed by everybody and nothing can be either edited or with
 Any lies are seen as a fork in a peer's home log.
 The very existence of a cryptographically signed fork means a peer is either compromised or dishonest.
 
-A compromised client can not rewrite its past transactions, because that ops will be rejected by its home peer.
-A client/per can not emit a new op with a lower timestamp than it already emitted before.
+A compromised client can not rewrite its past ops or inject backdated ops; such a behavior is rejected by peers.
 A compromised peer can not rollback its past transactions on two reasons:
 * they must be signed by the client who made the payment first,
-* once an op is propagated, it can not be rewritten retro-actively (see the split-coin section).
+* once an op is propagated, it can not be rewritten retro-actively, as peers stick with the version that arrives first (see the split-coin section).
 
 [git-merkle]: https://news.ycombinator.com/item?id=9436847
 
