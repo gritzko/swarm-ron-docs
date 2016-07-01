@@ -44,7 +44,7 @@ Distributed systems need distributed math.
 
 ## Network topology
 
-    The distributed currency of Ethereum does not depend on any government or bank, but only on Vitalik Buterin.
+> The distributed currency of Ethereum does not depend on any government or bank, but only on Vitalik Buterin.
 
 We generally assume a super-peer network architecture.
 A multi-level architecture may not satisfy some, but even de-jure flat networks (e.g. BitCoin) tend to have de-facto stratification (e.g. exchanges and top miners)
