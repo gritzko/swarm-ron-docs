@@ -26,7 +26,7 @@ A rolling hash chain guarantees that no ops have been withdrawn from a sequence 
 Such a hash chain can be defined for any linear op sequence, such as:
 
 * single replica op log (includes all ops created and stamped by the replica),
-* peer op log (included all the ops by the peer's clients in their arrival order) and
+* peer *home* op log (includes all the ops by the peer's clients in their arrival order) and
 * single-origin object op log (ops of a single replica over a single object).
 
 A rolling hash is defined irrespectively of whether it is mentioned explicitly in the respective op log.
