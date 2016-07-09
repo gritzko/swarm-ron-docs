@@ -7,7 +7,7 @@ There is no way to alter or censor the op stream in transit.
 
 Still, there is another group of attacks, most notably the famous double-spending attack, that depend on the attacker's ability to broadcast different versions of reality to different peers, i.e. to *lie*.
 Once the attacker sends out contradictory ops, that creates a swarm split-brain as on the picture `(I)`.
-If the swarm is physically permanently separated, the attacker (`A`) can lie to both parts of the network (`O`, `P` peers) regarding its own actions.
+If the swarm is physically permanently separated, the attacker `A` can lie to both parts of the network (`O`, `P` peers) regarding its own actions.
 Note that the attacker can not misrepresent or censor other peer's actions, as those are signed and entangled.
 Once `P` peers entangle `A`'s lies into their op streams, `A` can no longer relay `P`'s ops to the `O` side, because they are entangled to his own `P`-side lies.
 Similarly, it can no longer relay `O` ops to the `P` side as they get entangled with `O`-side lies.
@@ -23,9 +23,9 @@ Both `O` and `P` peers see the other side going offline.
 Suppose, the attacker does not control the bottleneck link, like on picture `(II)`.
 Then, the split-brain becomes transitory.
 The lie will be detected as soon as both versions of `A`'s actions are known to all peers.
-In the general case, that should happen at the [RTT timescale][rtt]).
+In the general case, that should happen at the [RTT timescale][rtt].
 For example, `R` peers will get the `R`-side lie first, `Q`-side lie second.
-The lie will be seen as a *fork* of the `A`'s [*home* op log](crypto.md): a certain op will be followed by two distinct versions of the consequent op.
+The lie will be seen as a *fork* of the `A`'s [*home op log*](crypto.md): a certain op will be followed by two distinct versions of the consequent op.
 
 So, the options for the attacking peer are quite limited.
 Still, there is a window of opportunity for the duration of the split-brain.
