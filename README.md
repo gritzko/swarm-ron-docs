@@ -4,24 +4,31 @@
 Swarm is a protocol for distributed data synchronization.
 Swarm is convergent (eventually-consistent) and spans to the client side.
 Technically, it does partially-ordered operation log synchronization.
+Swarm explicitly versions the data, every change is stamped with time and origin.
 Swarm supports:
 
-* end-to-end real-time incremental sync,
-* partial datasets on the client,
-* client-side caching,
-* offline work,
-* shared databases, etc
+* end-to-end real-time incremental sync (op-based),
+* partial datasets on the client (of arbitrary selection, no "rooms"/"channels"),
+* client-side caching (as the data is versioned, a cache can always be incrementally updated),
+* offline work (writes are queued, resubmitted on reconnection),
+* shared databases (where every change is attributed),
+* and lots of other exciting things.
 
 Swarm network architecture covers the range of use cases from a geo-distributed eventually consistent data store all the way to a [super-peer network][super].
-One important use case in the middle of the range is a shared database run by multiple parties (e.g. the [two-sided market][2sided] scenario).
+One important use case in the middle of the range is a shared database run by multiple parties (e.g. a [two-sided market][2sided] data exchange scenario).
 Another good fit is a real-time collaborative app backend.
 Swarm is neither a linear-log ACID database nor a symmetric peer-to-peer network.
-Neither it does any queries or indexes, leaving that to external [integrations](adaptor.md).
+Swarm bears strong resemblance to message bus / distributed log systems (Apache Kafka, Facebook Scribe), except it is partially ordered, so it can span to the client side and survive partitions (AP by [CAP][cap]).
+
+Swarm focuses on immutable op log synchronization.
+In academic terms, Swarm is a [reliable causal broadcast][opbased] and some replicated data types on top of that.
 
 Swarm synchronizes autonomous writable replicas.
 
 [2sided]: http://lexicon.ft.com/Term?term=two_sided-markets
 [super]: http://ilpubs.stanford.edu:8090/594/1/2003-33.pdf
+[opbased]: http://haslab.uminho.pt/sites/default/files/ashoker/files/opbaseddais14.pdf
+[cap]: https://www.infoq.com/articles/cap-twelve-years-later-how-the-rules-have-changed
 
 ## Inner parts
 
