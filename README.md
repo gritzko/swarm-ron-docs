@@ -8,7 +8,7 @@ Swarm explicitly versions the data, every change is stamped with time and origin
 Swarm supports:
 
 * end-to-end real-time incremental sync (op-based),
-* partial datasets on the client (of arbitrary selection, no "rooms"/"channels"),
+* partial datasets on the client (of arbitrary selection, not "rooms"/"channels"),
 * client-side caching (as the data is versioned, a cache can always be incrementally updated),
 * offline work (writes are queued, resubmitted on reconnection),
 * shared databases (where every change is attributed),
@@ -45,8 +45,8 @@ Concurrent operations may appear in different orders at different replicas.
 On top of the log, replicas can run versioned data structures formally described as [Replicated Data Types](rdt.md).
 The main focus is on op-based [CmRDTs](crdt.md#CmRDT).
 Swarm can support other constructs as well, such as state-based [CvRDT](crdt.md), logged asynchronous RPC and others, even [crypto coins](coin.md).
-
-An RDT replica can be described in the terms of the [state machine replication][smr] model.
+An RDT object can be described in the terms of the [state machine replication][smr] model: an *object* has a *state* mutated by inputs (*ops*).
+Those ops get delivered to every object's replica, so eventually their states converge.
 Swarm only uses data types that converge despite some possible reordering of concurrent operations (i.e. concurrent ops must commute).
 
 On the top of the RDT layer, there is a language-specific idiomatic API that hides all the op/state/metadata internals from the developer.
@@ -58,10 +58,10 @@ All the synchronization must happen automagically.
 ## Network topology
 
 Swarm picks the middle way of a super-peer network topology.
-Networks that are symmetric by design tend to display unavoidable stratification in practice (e.g. consider BitCoin miners).
-Such a dynamics likely owes to Adam Smith like laws: economies of scale and specialization provide too much benefit to be ignored.
+Networks that are symmetric by design tend to display unavoidable stratification in practice (e.g. consider BitCoin miners and exchanges).
+Such a dynamics likely owes to Adam Smith's laws: economies of scale and specialization provide too much benefit to be ignored.
 Hence, the ideal of a fully symmetric peer-to-peer network appears to be not worth pursuing.
-Meanwhile, ACID databases have very clear scalability thresholds.
+Meanwhile, ACID databases have very clear scalability limits.
 Also, the classic ACID database design normally assumes a single (institutional) user.
 A linear-log system can hardly be ran otherwise.
 Consequently, they save on the who-when-why metadata.
@@ -72,10 +72,10 @@ Peers must keep a full database replica.
 Clients can pick their dataset on object-by-object basis.
 Client replicas are fully autonomous, can cache all the data locally and make writes while offline.
 
-Every Swarm op is timestamped and attributed to its origin replica.
+Every Swarm [op](op.md) is [timestamped](stamp.md) and attributed to its origin replica.
 Ops are immutable from the moment of creation (e.g. compare that to repeatedly-mutable [OT][ot] ops).
-Ops propagate without causality violations.
-Practically, that means a replica can only relay ops in the order they were received (the *arrival* order).
+Ops propagate without [causality](order.md) violations.
+Practically, that means a replica can only relay ops in the order they were received (the [*arrival* order](order.md)).
 
 One may argue that Swarm is neither a true database (no indexes, no query language) nor a true peer-to-peer network ([*peer* admission](peerage.md) is not completely open).
 That is certainly a trade-off and there are ways to overcome those issues (e.g. database integrations and open *client* admission).
@@ -86,7 +86,7 @@ That is the core of it: a replicated log service (and a key-value database on to
 
 ## The math
 
-Swarm employs a variety of classic computer science models: state machine replication, Lamport logical time, sequential processes exchanging messages.
+Swarm employs a variety of computer science models: state machine replication, Lamport logical time, sequential processes exchanging messages, Commutative Replicated Data Types.
 It relies on TCP sequential delivery and log-structured database guarantees.
 
 The core contribution of the Swarm protocol is *practicality*.
