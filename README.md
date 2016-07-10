@@ -105,7 +105,8 @@ Use Swarm.
 ### History
 
 * 2012-2013: started as a part of the Yandex Live Letters project
-* 2014: becomes a separate project, version 0.3 is demoed in October (per-object logs and version vectors, not really scalable)
+* 2014 October: becomes a separate project, version 0.3 is demoed (per-object logs and version vectors, not really scalable)
 * 2015: version 0.4 is scrapped, the math is changed to avoid any version vector use
-* 2016: version 1.0 stabilizes by February (no v.vectors, new asymmetric client protocol)
-* 2016: version 1.1 gets peer-to-peer (server-to-server) sync in May
+* 2016 Feb: version 1.0 stabilizes (no v.vectors, new asymmetric client protocol)
+* 2016 May: version 1.1 gets peer-to-peer (server-to-server) sync
+* 2016 June: version 1.2 gets crypto (Merkle, entanglement)
