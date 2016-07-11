@@ -20,7 +20,7 @@ Those technologies originated well before the Internet.
 But, a similar picture is observed in the world of databases.
 Highly scalable databases (e.g. Cassandra, Riak) tend to avoid total order.
 When a linear-order database (e.g. MySQL) is scaled up, it is typically *sharded*.
-In other words, they give up on the global linear order.
+In other words, either scalability or global linear order.
 
 Hidden in plain sight is the fact that the total linearization of all transactions is not actually needed for a crypto currency.
 The same way, it is not needed by any real-world currency, because unrelated transactions don't need to be ordered.
@@ -42,13 +42,52 @@ Distributed systems need distributed math.
 [circle]: https://en.wikipedia.org/wiki/Squaring_the_circle
 [hawala]: https://www.treasury.gov/resource-center/terrorist-illicit-finance/Documents/FinCEN-Hawala-rpt.pdf
 
+## The general approach
+
+A reader may be surprised that we don't "reach Byzantine agreement" or "prevent double spends".
+There is no explicit "agreement" here and double spends are OK, so some readers may mark the scheme as "naive".
+Well, World Wide Web was marked "naive" because it allows for "broken links".
+It turned out, scalability is way more important than any broken links.
+Same trick here.
+
+Our version of "broken links" is "split coins", i.e. coins that were double-spent.
+For such a coin, different parts of the system recognize different owners.
+The idea is to make such a scenario
+1. difficult and expensive to arrange,
+2. fast and easy to detect and
+3. trivial to avoid.
+
+We rely on the [causal broadcast guarantees](order.md) as much as possible.
+Every replica generates a linear op log, so there can be only one valid op that passes a "coin object" from one replica to another.
+Op logs are [cryptographically hardened](crypto.md) and entangled, so there is no possibility to tamper or censor them.
+The mechanics of entanglement is reminiscent of [git DAG][git] signing.
+Any violation of causality is obvious in the log.
+A violation is a cryptographically signed replica log *fork*, when some replica issued many versions of its "next" op (those are called *lies*).
+
+Finally, there is an [entanglement matrix](matrix.md) that lets a peer track the progress of its transaction in the swarm.
+Once the majority of peers entangle the transaction into their op logs, directly or indirectly, we may say we have a "quorum".
+
+A double-spend event sequence is like this:
+1. Any peer may lie (fork its log), thus doing a double spend.
+2. Any other peer may see by the [matrix](matrix.md) that the transaction is not globally accepted yet (i.e. not entangled by the majority).
+3. As all lies get progressively entangled by other peers, peers get aware of the fork.
+4. The receiving peer sees it receives a double spent (split) coin.
+5. The double-spending peer faces eviction.
+
+We don't rely on any proof-of-work/proof-of-stake to seal transactions.
+We assume peers have established long-living identities and [peer-to-peer connections](peerage.md) take some effort to arrange.
+A transaction that is "buried" under many layers of peer cross-signatures becomes signed by "everyone" and hence *stable*.
+
+[git]: http://eagain.net/articles/git-for-computer-scientists/
+
 ## Network topology
 
-> The distributed currency of Ethereum does not depend on any government or bank, but only on Vitalik Buterin.
+> The distributed currency of Ethereum does not depend on any government or bank. It only depends on Vitalik Buterin.
 
-We generally assume a super-peer network architecture.
+We assume a [super-peer network](peerage.md) where *peers* have established identities and peer-to-peer connections need to be arranged.
+*Clients* only talk to their home peers.
 A multi-level architecture may not satisfy some, but even de-jure flat networks (e.g. BitCoin) tend to have de-facto stratification (e.g. exchanges and top miners).
-Adam Smith-like economies of scale and specialization inevitably lead to the emergence of high-volume high-efficiency nodes.
+According to Adam Smith, economies of scale and specialization inevitably lead to the emergence of high-volume high-efficiency nodes.
 Complex networks tend to be hub-dominated.
 We don't want to argue with the nature.
 
