@@ -1,23 +1,23 @@
-; zero: base64x64, decimal
+; print zero: base64x64, decimal
 0
 0
 
-; infinity in 64x64, decimal
+; print infinity: 64x64, decimal
 ~
 1134907106097364992
 
-; non-numeric inf+1
+; print a non-numeric value: inf+1 (64, dec)
 ~000000001
 1134907106097364993
 
-; "on" in decimal, base64x64
+; print "on" in decimal, base64x64
 932808072819113984
 on
 
-; "on00" in decimal (the same)
+; convert "on00" to decimal (the same)
 932808072819113984
 
-; base64x64 numbers 0 to 64*64
+; print all base64x64 numbers 0 to 64*64 (inclusive)
 0
 0000000001
 0000000002
