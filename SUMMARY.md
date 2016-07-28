@@ -15,6 +15,8 @@
     * [Client handshakes](client_handshake.md) - for clients, to connect to a database
     * [Object handshakes](object_handshake.md) - for clients, to fetch an object and subscribe to updates
 * [Replicated data types](rdt.md) - everything that can run on top of Swarm
+    * [Last-write-wins object](types/object.md) - a very popular
+      simple type
     * [CRDT](crdt.md) - our beloved and precious Conflict-free replicated data types
     * [Swarm coin](coin.md) - an example of a non-CRDT RDT with expicit
       inconsistencies, a crypto currency
