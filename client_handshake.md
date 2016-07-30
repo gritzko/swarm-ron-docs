@@ -22,12 +22,12 @@ Then, the return `.on` must be scoped to the newly granted complete replica id.
 
 An example of a successful handshake by a new client receiving a replica id and database metadata:
 
-    > /Swarm#database!0.on+0agn007
+    > /Swarm#database!0.on+0agn007=
         Password: test123
-    < /Swarm#database!1CQAneD1+X~.~
+    < /Swarm#database!1CQAneD1+X~.~=
         !1CQAneD+X~.Access OwnWriteAllRead
         !1CQAneD1+X~.ReplicaIdScheme 163
-    < /Swarm#database!1CQZ38+X~.on+Xagn0071xQ
+    < /Swarm#database!1CQZ38+X~.on+Xagn0071xQ=
         Secret: 3ff470571abe2c93cadcd43362ed7756c9fc9ac0
 
 Note that the value format of `.on` pseudo-ops is not covered by this specification.
