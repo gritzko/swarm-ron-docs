@@ -30,7 +30,8 @@ turns into
 
 Note that single-indexed accesses read/write a vector which does not belong to the two-indexed matrix.
 Single-indexed accesses get serialized as `.~0`, `.~1`, `.~3`... while two-indexed turn into `.~0+~0`, `.~1+~0`...
-Indexed access supports vectors up to 2^54 cells and matrices up to 2^54x2^54 (although it is recommended to limit yourself to 2^40 because JavaScript has no 64 bit integers).
+Indexed access supports vectors up to 2^30 cells (more than a billion).
+Matrices are up to 2^30 cells in each dimension.
 
 `Object` state snapshot is serialized as *normalized* JSON map where keys are op names and values are values:
 
