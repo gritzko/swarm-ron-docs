@@ -28,23 +28,23 @@ All examples in this specification will use the [Base64x64](64x64.md) coding.
 When serialized, each token is a Base64x64 stamp string preceded by a non-base64 separator ( `/`, `#`, `!` and `.` for object type, object id, event stamp and event name respectively).
 For example, let's read this specifier:
 
-    /LWWObject#1D4ICCEc+XaUth1_K!1D4IDvD4+XaUth1_K.title
+    /LWWObject#1D4ICCEc+XU5eRJ0K!1D4IDvD4+XU5eRJ0K.title
 
 * an object of type `LWWObject` (transcendent constant)
-* object id `1D4ICCEc+XaUth1_K`, i.e. created by session `K` of the user `aUth1_` attached to the server `X` (assuming the `0163` [replica id scheme](replica.md)) on Sun Jun 05 18:12:12 UTC 2016
+* object id `1D4ICCEc+XU5eRJ0K`, i.e. created by session `K` of the user `U5eRJ0` attached to the server `X` (assuming the `0163` [replica id scheme](replica.md)) on Sun Jun 05 18:12:12 UTC 2016
 * changed by the same replica on `1D4IDvD4`, Sun Jun 05 18:13:58 UTC 2016
 * affecting the field `title` (`LWWObject` is a very basic per-field Last Write Wins type, event names are field names, one field write per op)
 
 The terms for different parts of a specifier are summarized below:
 
-    specifier---object--type----class           Object
-        |          |     +------parameters      0
-        |          +----id------birth           1D4ICCEc
-        |                +------creator         XaUth1_K
-        +-------event---stamp---time            1D4IDvD4
-                   |     +------origin          XaUth1_K
-                   +----name----method          title
-                         +------scope           0
+    specifier---object--type----class       LWWObject   name of an RDT class
+        |          |     +------parameters  0           type (template) params
+        |          +----id------birth       1D4ICCEc    object creation time
+        |                +------creator     XU5eRJ0K    who created the object
+        +-------event---stamp---time        1D4IDvD4    time of the event
+                   |     +------origin      XU5eRJ0K    replica it happened at
+                   +----name----method      title       method of the RDT class
+                         +------scope       0           scope (0 for global)
 
 Note that the alphanumeric order of specifiers is meaningful:
 * it groups one object's operations together and
