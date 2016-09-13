@@ -1,0 +1,89 @@
+;
+; handshake: db options, ssn id grant, clocks,
+; state snapshot, replica id scheme, spec abbrev
+; (testusr password is "1")
+;
+> /Swarm#test!0.on+0testusr m3G5qluaUSe543n/CtQJvP6soXWs0oIW5wU4BpPM9ms=
+>
+< /Swarm#test!00003+R.~+Rtestusr01=
+<  !00001+R.Clock	"Logical"
+<  !00002+R.ClockLen	5
+<  !00003+R.DBIdScheme	"0172"
+.on+Rtestusr01
+
+;
+; create an object: state push, abbrev
+;
+> /LWWObject#00002+Rtestusr01!00002+Rtestusr01.~=
+>  !00002.Key "value"
+> .on+Rtestusr01
+>
+/LWWObject#00002+Rtestusr01!00002+Rtestusr01.on+Rtestusr01
+
+;
+; just a mutation
+;
+> /LWWObject#00002+Rtestusr01!00003+Rtestusr01.Key "new value"
+>
+/LWWObject#00002+Rtestusr01!00003+Rtestusr01.Key "new value"
+
+;
+; resubscription to get the patch
+;
+> /LWWObject#00002+Rtestusr01!00002+Rtestusr01.on+Rtestusr01
+>
+/LWWObject#00002+Rtestusr01!00003+Rtestusr01.Key+Rtestusr01 "new value"
+.on+Rtestusr01
+
+;
+; resubscription to get the snapshot
+;
+> /LWWObject#00002+Rtestusr01!0.on+Rtestusr01
+>
+/LWWObject#00002+Rtestusr01!00003+Rtestusr01.~+Rtestusr01 !00003+Rtestusr01.Key "new value"
+.on+Rtestusr01
+
+; error-wrong replica id
+> /LWWObject#00002+Rtestusr01!00004+Rwrngusr01.Key "rejected value"
+> 
+/LWWObject#00002+Rtestusr01!00004+Rwrngusr01.~~~~~~~~~~+Rtestusr01 WRONG ORIGIN
+
+; error - state push
+> /LWWObject#00002+Rtestusr01!00004+Rtestusr01.~
+>
+/LWWObject#00002+Rtestusr01!00004+Rtestusr01.~~~~~~~~~~+Rtestusr01 NO STATE PUSH
+
+; warning - op replay
+> /LWWObject#00002+Rtestusr01!00003+Rtestusr01.Key "new value"
+>
+/LWWObject#00002+Rtestusr01!00003+Rtestusr01.~~~~~~~~~~+Rtestusr01 OP REPLAY
+
+; wrong scope
+> /LWWObject#00002+Rtestusr01!0.on+RwrngusrXX
+>
+/LWWObject#00002+Rtestusr01!0.~~~~~~~~~~+Rtestusr01 WRONG SCOPE
+
+;
+; subscription to an unknown object
+;
+> /LWWObject#00005+Rtestusr01!0.on+Rtestusr01
+>
+/LWWObject#00005+Rtestusr01!0.on+Rtestusr01
+
+;
+; non-existing unsubscription (no problem, who cares)
+;
+> /LWWObject#00007+Rtestusr01!0.off+Rtestusr01
+>
+/LWWObject#00007+Rtestusr01!0.off+Rtestusr01
+
+; unsubscription
+> /LWWObject#00002+Rtestusr01!0.off+Rtestusr01
+>
+/LWWObject#00002+Rtestusr01!0.off+Rtestusr01
+
+; connection end
+> /Swarm#test!0.off+Rtestusr01
+>
+/Swarm#test!00003+Rtestusr01.off+Rtestusr01
+
