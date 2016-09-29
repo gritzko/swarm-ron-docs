@@ -9,7 +9,7 @@
 <  !00001+R.Clock	"Logical"
 <  !00002+R.ClockLen	5
 <  !00003+R.DBIdScheme	"0172"
-.on+Rtestusr01
+< .on+Rtestusr01
 
 ;
 ; create an object: state push, abbrev

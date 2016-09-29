@@ -1,4 +1,4 @@
- # Specs #
+# Specs #
 
 A "specifier" is a descriptive identifier for an [immutable op](op.md).
 The term itself is liberally borrowed from linguistics.
