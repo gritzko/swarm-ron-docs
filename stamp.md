@@ -1,7 +1,7 @@
-# Swarm stamps / ids #
+# Swarm stamp (id)
 
-Swarm stamps are [logical timestamps][mslamp] that identify events and objects, convey event order, and causality to some degree.
-Swarm stamps are pairs of [64-bit numbers](64x64.md):
+Swarm timestamps are [logical timestamps][mslamp] that identify events and objects, convey event order, and causality to some degree.
+Swarm timestamps are pairs of [64-bit numbers](64x64.md):
 
 1. a variable-precision timestamp and
 2. a replica id.
@@ -12,8 +12,6 @@ Actually, [RFC4122 Version 1 UUID][uuid] *is* a 128-bit logical timestamp.
 Swarm timestamps are extensively used in the protocol, so the format is made as compact as possible, while preserving human readability.
 
 Stamps are serialized in [Base64x64](64x64.md) using either `+` or `-` as a pair separator, e.g. `1CQKneD1-X` (time `1CQKneD1`, [replica id](replica.md) `X`).
-Replica id may be empty (numerically, 0) for *transcendent* values.
-Those are global constants that are precisely defined mathematically, hence independent of any origin or time.
 
 Swarm timestamps are based on the Gregorian calendar and not milliseconds-since-epoch because they are [hybrid][hybrid] (logical, calendar-aware).
 Intuitive understanding of timestamps is a higher priority than easy calculation of time intervals.
@@ -28,12 +26,17 @@ Swarm epoch date is 1 Jan 2010 00:00:00 UTC (Unix epoch plus 1262304000000 ms).
 [Replica ids](replica.md) are hierarchical, typically having three parts: peer replica (server) id bits, user id bits and session id bits.
 For example, in the [0172 scheme](replica.md), replica id `Xgritzko5` has server id `X`, user id `gritzko` and session id `50`.
 
-By convention, no regular timestamps or replica ids start with '~'.
-Such values are considered *abnormal* and not treated as regular timestamps.
+Every timestamp is an id, but not vice-versa.
+An id may be a global *transcendent* constant that is precisely defined mathematically, hence independent of any origin or time.
+For transcendent ids, replica id is empty (numerically, 0).
+Transcendent ids are not timestamps.
+
+Similarly, no regular timestamps or replica ids start with `~`.
+Such ids are considered *abnormal*. Abnormals are not timestamps.
 For example:
-* `~state` is the name for the op carrying the state snapshot,
-* `~` is the timestamp for "never",
-*  a negative-acknowledgement op ("I will never read from you") has a [specifier](spec.md) of `@~:~on`,
+* `~state-Rgritzko1` is the name for an op carrying an object's state to replica `Rgritzko1`,
+* `~` is a timestamp for "never",
+*  a negative-acknowledgement op ("I will *never* read from you") has `~` as its version field,
 * `~~~~~~~~~~` is simply "error value",
 * [type parameters](type-params.md) are abnormal origin values,
 * etc etc.
