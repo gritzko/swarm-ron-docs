@@ -15,16 +15,16 @@ The solution is to compress intervals of similar ids into *runs*.
 That way, we are still using a simple data structure (array/string).
 Still, we can inspect it on run at a time, which greatly increases the speed of seek, search and iteration.
 
-A run consists of the *head* id and a *body*
+A run consists of the *head* id and a *body*.
 We simply extend the timestamp syntax to serialize runs.
 Each run body is either a numeral or a sequence of fixed-width elements separated by one of `;,'"`.
-For example: `@0;8` (a run of eight zeros).
+For example: `@0;8` (a run of eight zeros, see 2.1).
 
 1. run head compression modes
     1. full uncompressed id, e.g. `@1CQKneD-Rgritzko01`
-    2. same-origin id, e.g. `@1CQKneD-`
-    3. mentioned-origin id, e.g. `@1CQKneD>5`
-    4. borrow the id from some reference sequence, e.g. `@<`
+    2. same-origin id, e.g. `@1CQKneD-` -- simply use the origin from the previous id
+    3. frequent-origin id, e.g. `@1CQKneD-Rgritzko01>5` -- simply remembers this origin under shortcut 5
+    4. mentioned-origin, e.g. `@1CQKneD<5` -- reuses a frequent origin (number 5)
 2. run body compression modes
     1. same-value run, e.g. `;8` -- repeat eight times
     2. close-value run, e.g. `,abc` -- replace the last timestamp character
