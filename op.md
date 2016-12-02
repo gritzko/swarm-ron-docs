@@ -61,9 +61,9 @@ The must-have feature of data synchronization mostly boils down to delivering ev
     <tr>
         <td><i><b></td>
         <td colspan='2'><b>object id</td>
-        <td colspan='2'><b>type id</td>
+        <td colspan='2'><b>object type</td>
         <td colspan='2'><b>event id</td>
-        <td colspan='2'><b>location id</td>
+        <td colspan='2'><b>event location</td>
     </tr> </thead>
     <tr>
         <td><i>timestamp id</td>

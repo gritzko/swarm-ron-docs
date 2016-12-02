@@ -1,4 +1,4 @@
-# The Swarm Protocol 1.2.1 #
+# The Swarm Protocol 1.4.0 #
 [*see on GitBooks: PDF, ebook, etc*](https://gritzko.gitbooks.io/swarm-the-protocol)
 
 Swarm is a protocol for distributed data synchronization.
@@ -64,7 +64,7 @@ Hence, the ideal of a fully symmetric peer-to-peer network appears to be not wor
 Meanwhile, ACID databases have very clear scalability limits.
 Also, the classic ACID database design normally assumes a single (institutional) user.
 A linear-log system can hardly be ran otherwise.
-Consequently, they save on the who-when-why metadata.
+Consequently, they save on that who-when-why metadata.
 
 Swarm *peers* connect to each other in an arbitrary fashion, the only requirement is that the graph should be connected most of the time.  
 Peers must keep a full database replica.
@@ -74,7 +74,7 @@ Client replicas are fully autonomous, can cache all the data locally and make wr
 
 Every Swarm [op](op.md) is [timestamped](stamp.md) and attributed to its origin replica.
 Ops are immutable from the moment of creation (e.g. compare that to repeatedly-mutable [OT][ot] ops).
-Ops propagate without [causality](order.md) violations.
+Ops propagate without any [causality](order.md) violations.
 Practically, that means a replica can only relay ops in the order they were received (the [*arrival* order](order.md)).
 
 One may argue that Swarm is neither a true database (no indexes, no query language) nor a true peer-to-peer network ([*peer* admission](peerage.md) is not completely open).

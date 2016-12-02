@@ -1,14 +1,14 @@
-# Swarm stamp (id)
+# Swarm timestamp (id)
 
-Swarm timestamps are [logical timestamps][mslamp] that identify events and objects, convey event order, and causality to some degree.
+Swarm timestamps are [Lamport timestamps][mslamp] that identify events and objects, convey event order, and causality to some degree.
 Swarm timestamps are pairs of [64-bit numbers](64x64.md):
 
 1. a variable-precision timestamp and
 2. a replica id.
 
-The general idea here is that a logical timestamp can be an identifier to *anything*.
+The general idea here is that such a timestamp can be an identifier to *anything*.
 Given that each stamp is a 128-bit number, its numbering capacity is equal to an UUID.
-Actually, [RFC4122 Version 1 UUID][uuid] *is* a 128-bit logical timestamp.
+Actually, [RFC4122 Version 1 UUID][uuid] *is* a 128-bit Lamport timestamp.
 Swarm timestamps are extensively used in the protocol, so the format is made as compact as possible, while preserving human readability.
 
 Stamps are serialized in [Base64x64](64x64.md) using either `+` or `-` as a pair separator, e.g. `1CQKneD1-X` (time `1CQKneD1`, [replica id](replica.md) `X`).

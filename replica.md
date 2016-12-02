@@ -37,8 +37,8 @@ Peers are the most flexible joint in this tree; a peer id chunk may be 0 to 10 c
 A client has a partial replica of a database and a filtered log, provided by some peer.
 Clients can only synchronize with their upstream peers.
 Although there is a special technique to [move a client replica](handover.md) to a different peer, that is an exceptional situation.
-Note that clients can have the same id, when connected to a different pee, e.g. Xclient and Yclient, depending on [database options](options.md).
-A client chunk length is 0 to 2 chars (more than enough to number every person on the planet and every their hair).
+Note that clients can have the same id, when connected to a different peer, e.g. Xclient and Yclient, depending on [database options](options.md).
+A client chunk length is 0 to 8 chars (more than enough to number every person on the planet and every their hair).
 
 ## Sessions
 
@@ -48,3 +48,10 @@ Although all those replicas have the same access rights, they are still differen
 Hence, they have different replica ids.
 As all the client's sessions are connected to the same peer, it is possible to recycle session ids by invalidating long-unseen sessions.
 1-2 chars is enough for a session id chunk.
+
+## Compound ids
+
+Replica ids are normally used as the second part of a [Lamport timestamp](stamp.md). Hence, they are part of stamps and object ids. Also, replica ids are a part of stamp-like identifiers which are not stamps per se:
+
+* db replica id has a form of `dbname+replicaid` (this one is used when either a client or a server has multiple databases open)
+* connection id has a form of `timestamp+replicaid` (the timestamp comes from the upstream, while the replica id refers to the downstream)
