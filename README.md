@@ -47,11 +47,12 @@ Following the TCP/IP analogy, Swarm offers its own stack of progressively higher
 
 At the bottom, there is a log of immutable [operations](op.md).
 At the next layer, RDT reducers turn streams of operations into object states.
-At the top layer, object's internal states are turned into idiomatic APIs for a particular language.
+At the top layer, objects' internal states are turned into idiomatic APIs for a particular language.
+We an compare these three layers to IP packets, TCP data streams and POSIX sockets respectively.
 
 ### Op log primitives -- ids, ops
 
-Any change is introduced into the system as an operation with a globally unique id.
+Any change is introduced into the system as an [operation](op.md) with a [globally unique id](id.md).
 Hence, any entity can be referenced by the id of its genesis op.
 An op consists of five parts: four ids and a value.
 Four ids are:
