@@ -17,7 +17,7 @@ Swarm's mission is to seamlessly synchronize data in the background, in real-tim
 
 Technically, Swarm is based on a partially-ordered log of immutable operations.
 Every Swarm event/operation is stamped with a globally unique identifier.
-A Swarm id is a 128-bit hybrid timestamp citing the event's time and origin, very much like UUID v1.
+A [Swarm id](id.md) is a 128-bit hybrid timestamp citing the event's time and origin, very much like [UUID v1][uuid].
 Those Swarm ids are used to reference any event or entity in the system.
 Swarm explicitly versions all the data, so every version is referenced by its Swarm id too (in the local context).
 Essentially, Swarm ids solve two problems: naming things and cache invalidation.
@@ -35,6 +35,7 @@ The Swarm's projected use cases can be broadly divided into three classes:
 [opbased]: http://haslab.uminho.pt/sites/default/files/ashoker/files/opbaseddais14.pdf
 [cap]: https://www.infoq.com/articles/cap-twelve-years-later-how-the-rules-have-changed
 [rdt]: TODO
+[uuid]: http://tools.ietf.org/html/rfc4122
 
 ## Inner parts
 
@@ -61,7 +62,7 @@ Four ids are:
 4. location id.
 
 Those four ids form an operation's generic "header".
-Like in TCP/IP, op routing only reads the header.
+Like in TCP/IP, op routing only needs the header.
 The value is either an arbitrary piece of JSON or a *reference* (an object id).
 Thus, the value is an op's free-form "body" carrying all the datatype-specific information.
 
@@ -73,7 +74,7 @@ Swarm can support other constructs as well, such as state-based [CvRDT](crdt.md)
 An RDT object can be described in the terms of the [state machine replication][smr] model: an *object* has a *state* mutated by inputs (*ops*).
 Those ops get delivered to every object's replica, so eventually their states converge.
 A data type can also be seen as a *reducer* function that turns a stream of ops into the resulting state.
-Swarm only uses data types that converge despite some possible reordering of concurrent operations (i.e. concurrent ops must commute).
+Swarm can only employ data types that converge despite some possible reordering of concurrent operations (i.e. concurrent ops must commute).
 
 ### API
 
@@ -91,7 +92,7 @@ At the same time, explicit stratification greatly contributes to the protocol's 
 
 Swarm *peers* connect to each other in an arbitrary fashion, so the graph is connected most of the time.
 Each peer must keep a full database replica.
-*Clients* only connect to their *home* peers.
+A *clients* only connects to its *home* peer.
 Clients can pick their dataset on object-by-object basis.
 Client replicas are still fully autonomous, can cache all the data locally and make writes while offline.
 
@@ -125,12 +126,12 @@ An implementation is likely to rely on a combination of TCP's sequential deliver
 
 The core contribution of the Swarm protocol is its *practicality* in regard to various trade-offs.
 For example, it is possible to implement a CRDT-based database literally, along the definitions, but that will hardly be practical.
-Swarm arranges primitives in a way to make metadata overhead acceptable, a known hurdle in CRDT-based solutions.
+Swarm arranges primitives in a way to make metadata overhead acceptable, which is a known hurdle with CRDT-based solutions.
 In particular, Swarm avoids the *explicit* use of version vectors.
 Those turn untenable when every client device runs its own replica.
 
-Swarm [op format](op.md) is made lightweight enough to fit the limitations of a key-value storage.
-It also keep the overhead low for op-chatty applications.
+Swarm [op format](op.md) is made simple enough to fit the limitations of a key-value storage.
+It keeps the overhead low for op-chatty applications.
 For example, realtime collaborative text editors are likely to create one op for one keystroke.
 
 A good entry point to start studying the Swarm protocol is its [subscription handshakes](handshake.md).
