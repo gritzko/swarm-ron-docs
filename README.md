@@ -48,7 +48,7 @@ Following the TCP/IP analogy, Swarm offers its own stack of progressively higher
 At the bottom, there is a log of immutable [operations](op.md).
 At the next layer, RDT reducers turn streams of operations into object states.
 At the top layer, objects' internal states are turned into idiomatic APIs for a particular language.
-We an compare these three layers to IP packets, TCP data streams and POSIX sockets respectively.
+We can compare these three layers to IP packets, TCP data streams and POSIX sockets respectively.
 
 ### Op log primitives -- ids, ops
 
@@ -113,6 +113,8 @@ The core of Swarm is a replicated log service; it also builds a key-value databa
 Potentially, Swarm network architecture covers the range of use cases from a geo-distributed eventually consistent data store all the way to a [super-peer network][super].
 Swarm is neither a linear-log ACID database nor a symmetric peer-to-peer network.
 
+TCP stream vs op stream
+
 
 ## The math
 
@@ -133,7 +135,7 @@ Those turn untenable when every client device runs its own replica.
 
 Swarm [op format](op.md) is made simple enough to fit the limitations of a key-value storage.
 It keeps the overhead low for op-chatty applications.
-For example, realtime collaborative text editors are likely to create one op for one keystroke.
+For example, realtime collaborative text editors are likely to create an op for each new keystroke.
 
 A good entry point to start studying the Swarm protocol is its [subscription handshakes](handshake.md).
 
