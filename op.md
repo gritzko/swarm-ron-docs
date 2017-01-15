@@ -25,7 +25,7 @@ Operations are uniquely [timestamped](id.md) at their origin replica using the r
 Those timestamps are later reused to identify and reference any entity in the system: types, objects, locations within objects, etc.
 Essentially, ops reference other ops.
 The most common example is an object id which is normally a reference to the object creation op.
-Sometimes, ids are transcendent (`txt`, `dbname`) or abnormal (`~on`, `~state`, `~gritzko`), not timestamps.
+Sometimes, ids are transcendent (`txt`, `dbname`) or abnormal (`~on`, `~state`, `~gritzko`), those are not timestamps.
 
 The [Base64x64](64x64.md) serialization of an op employs four distinct separators for each kind of an id (`#`, `.`, `@` and `:`) and `=` as a value separator.
 This format is line-based, one op takes one line. Two examples:
@@ -42,10 +42,10 @@ Examples:
 3. `"string"`
 4. `"multiline\nstring"`
 5. `{"json":"object"}`
+Complex JSON objects are still treated as "atoms", i.e. there is no possibility of addressing within them, merging changes, etc.
 6. `[1,"json",["array"]]`
 7. `#1CQZ38-Y` (reference)
 
-Complex JSON objects are still treated as "atoms", i.e. there is no possibility of addressing within them, merging changes, etc.
 A complex mergeable addressable object can only be assembled out of atoms using multiple operations.
 
 Another way of op serialization is to employ fixed width 512-bit keys made of eight 64-bit integers.
