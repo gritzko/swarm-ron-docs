@@ -82,8 +82,8 @@ The syntax outline:
 
 1. constants follow very predictable conventions:
     * integers `1`
-    * e-notation floats `3.1415`, `1e+6`
-    * UTF-8 `"strings"`
+    * e-notation floats: `3.1415`, `1e+6`
+    * UTF-8 JSON-escaped strings: `"строка\n线\t\u7ebf\n라인"`
     * UID references `1D4ICC-XU5eRJ`
 2. UIDs use a compact custom serialization
     * RON UIDs mostly correspond to v1 UUIDs (128 bit, globally unique, contains a timestamp and a process id)
@@ -100,20 +100,20 @@ The syntax outline:
     * `>` starts a reference (UID)
 4. frame format employs cross-columnar compression
     * repeated UIDs can be skipped altogether ("same as in the last op")
-    * RON abbreviates similar UIDs using prefix [compression](compression.md)
+    * RON abbreviates similar UIDs using [prefix compression](compression.md), e.g. `@1D4ICCE-XU5eRJ` gets compressed to `@\{E\` if preceded by `#1D4ICC-XU5eRJ`
 
 Consider a JSON object `{"keyA":"valueA", "keyB":"valueB"}`.
 A RON frame for that object will have three ops: one header op and two key-value ops.
 If compressed, that frame may look like
-`.lww#1D4ICC-XU5eRJ@\{E\ :keyA"valueA" @{1:keyB"valueB"` -- just a bit more than the size of the bare JSON.
+`.lww#1D4ICC-XU5eRJ@\{E\! :keyA"valueA" @{1:keyB"valueB"` -- just a bit more than the size of the bare JSON.
 That is impressive given the amount of metadata (and you can't replicate data correctly without the metadata).
-The frame takes less space than *two* [RFC4122 UUIDs][rfc4122]; but it contains *twelve* UIDs (6 distinct) and also the data!
+The frame takes less space than *two* [RFC4122 UUIDs][rfc4122]; but it contains *twelve* UIDs (6 distinct) and also the data.
 
 
 ## The math
 
 Swarm RON employs a variety of well-studied computer science models.
-The general flow of synchronization follows the state machine replication model,
+The general flow of RON data synchronization follows the state machine replication model,
 albeit [Commutative Replicated Data Types][crdt] enable partial orders.
 UIDs are essentially [Lamport logical timestamps][lamport], although they borrow a lot from RFC4122 UUIDs.
 RON wire format is a [regular language][regular].
@@ -129,16 +129,18 @@ Hopefully, it will enable some yet-unknown applications as well.
 Use Swarm RON!
 
 
-### History
+## History
 
 * 2012-2013: started as a part of the Yandex Live Letters project
-* 2014 October: becomes a separate project, version 0.3 is demoed (per-object logs and version vectors, not really scalable)
+* 2014 Feb: becomes a separate project
+* 2014 October: version 0.3 is demoed (per-object logs and version vectors, not really scalable)
 * 2015: version 0.4 is scrapped, the math is changed to avoid any version vector use
 * 2016 Feb: version 1.0 stabilizes (no v.vectors, new asymmetric client protocol)
 * 2016 May: version 1.1 gets peer-to-peer (server-to-server) sync
 * 2016 June: version 1.2 gets crypto (Merkle, entanglement)
 * 2016 October: functional generalizations (map/reduce)
 * 2016 December: cross-columnar compression
+* 2017 May: Swarm RON 2.0.0
 
 [2sided]: http://lexicon.ft.com/Term?term=two_sided-markets
 [super]: http://ilpubs.stanford.edu:8090/594/1/2003-33.pdf
