@@ -1,105 +1,132 @@
-# The Swarm Protocol 1.2.1 #
+# Swarm Replicated Object Notation 2.0.0 #
 [*see on GitBooks: PDF, ebook, etc*](https://gritzko.gitbooks.io/swarm-the-protocol)
 
-Swarm is a protocol for distributed data synchronization.
-Swarm is convergent (eventually-consistent) and spans to the client side.
-Technically, it does partially-ordered operation log synchronization.
-Swarm explicitly versions the data, every change is stamped with time and origin.
-Swarm supports:
+Swarm Replicated Object Notation is a distributed data format.
+It is designed to synchronize massively replicated datasets.
+RON is [log-structured][log]: it sees data as a stream of changes (think [Kafka][kafka]).
+RON is [information-centric][icn]: the data is independent of its place of storage (think [git][git]).
+RON is CRDT-friendly; [Conflict-free Replicated Data Types][crdt] enable real-time data sync (think Google Docs).
 
-* end-to-end real-time incremental sync (op-based),
-* partial datasets on the client (of arbitrary selection, not "rooms"/"channels"),
-* client-side caching (as the data is versioned, a cache can always be incrementally updated),
-* offline work (writes are queued, resubmitted on reconnection),
-* shared databases (where every change is attributed),
-* and lots of other exciting things.
+RON is neither an "app" nor a "framework". It is a text-based data format, much like XML or JSON.
+While XML and JSON focus on serializing lumps of state, RON serializes a stream of changes.
+Even an object's state is represented as a batch of compacted changes.
 
-Swarm network architecture covers the range of use cases from a geo-distributed eventually consistent data store all the way to a [super-peer network][super].
-One important use case in the middle of the range is a shared database run by multiple parties (e.g. a [two-sided market][2sided] data exchange scenario).
-Another good fit is a real-time collaborative app backend.
-Swarm is neither a linear-log ACID database nor a symmetric peer-to-peer network.
-Swarm bears strong resemblance to message bus / distributed log systems (Apache Kafka, Facebook Scribe), except it is partially ordered, so it can span to the client side and survive partitions (AP by [CAP][cap]).
+RON change records (ops) are self-contained and context-independent.
+For example, JSON expresses relations by element positioning:
+`{ "foo": {"bar": 1} }` (inside foo, bar equals 1).
+RON may express that fact as:
+```
+.lww#time1-userA@\\ :bar=1
+#root@time2-userB   :foo>time1-userA
+```
+Those are two RON ops.
+First, some object has a field "bar" set to 1.
+Second, another object has a field "foo" set to the first object.
 
-Swarm focuses on immutable op log synchronization.
-In academic terms, Swarm is a [reliable causal broadcast][opbased] and some replicated data types on top of that.
+JSON serializes state snapshots.
+RON serializes streams of changes where each change is versioned and attributed (e.g. at time `time2`, `userB` set `foo` to `time1-userA`).
+With RON, every #object, @version, :location or .type has its own explicit [UID](uid.md), so it can be referenced later unambiguously.
 
-Swarm synchronizes autonomous writable replicas.
+RON focuses on mobile devices.
+The metadata enables client-side replicas to synchronize incrementally and to stay writeable offline.
+One may say, RON metadata solves both naming things and cache invalidation.
 
-[2sided]: http://lexicon.ft.com/Term?term=two_sided-markets
-[super]: http://ilpubs.stanford.edu:8090/594/1/2003-33.pdf
-[opbased]: http://haslab.uminho.pt/sites/default/files/ashoker/files/opbaseddais14.pdf
-[cap]: https://www.infoq.com/articles/cap-twelve-years-later-how-the-rules-have-changed
+RON makes no strong assumptions about consistency guarantees: linearized, causal-order or gossip environments are all fine.
+Once all the object's ops are propagated to all the object's replicas, replicas converge to the same state.
+RON formal model makes this process correct.
+RON wire format makes this process efficient.
 
-## Inner parts
 
-Swarm replica architecture can be explained in nine letters:
+## Formal model
 
-    API
-    RDT
-    LOG
+RON formal model has four key components:
 
-At its bottom, Swarm is a replication system for a *partially* ordered log of immutable [operations](op.md).
-Partial order means operations may be created concurrently at different replicas, then propagated globally.
-Concurrent operations may appear in different orders at different replicas.
+1. an [op](op.md) is an atomic unit of data change
+    * ops are context-independent; an op specifies precisely its place, time and value
+    * ops are immutable once created
+    * ops assume [causally consistent][causal] delivery
+    * an op is a tuple of four [UIDs](uid.md) and one or more constants:
+        1. the data type UID,
+        2. the object's UID,
+        3. the location UID,
+        4. the op's own UID,
+        5. constants are strings, integers, floats or references ([UIDs](uid.md)).
+2. a [frame](frame.md) is a batch of ops
+    * an object's state is a frame
+    * a "patch" (aka "delta", "diff") is also a frame
+    * in general, data is seen as a [partially ordered][po] log of frames
+3. a [reducer](reducer.md) is a RON term for a "data type"
+    * a [reducer][re] is a pure function: `f(state_frame, change_frame) -> new_state_frame`
+    * reducers define how object state is changed by new ops
+    * reducers are:
+        1. associative,
+        2. commutative for concurrent ops,
+        3. optionally, idempotent.
+4. a [mapper](mapper.md) translates a replicated object's inner state into other formats
+    * mappers turn RON objects into JSON or XML documents, C++, JavaScript or other objects
+    * mappers are one-way: RON metadata may be lost in conversion
+    * mappers can be pipelined, e.g. one can build a full RON->JSON->HTML [MVC][mvc] app using just mappers.
 
-On top of the log, replicas can run versioned data structures formally described as [Replicated Data Types](rdt.md).
-The main focus is on op-based [CmRDTs](crdt.md#CmRDT).
-Swarm can support other constructs as well, such as state-based [CvRDT](crdt.md), logged asynchronous RPC and others, even [crypto coins](coin.md).
-An RDT object can be described in the terms of the [state machine replication][smr] model: an *object* has a *state* mutated by inputs (*ops*).
-Those ops get delivered to every object's replica, so eventually their states converge.
-Swarm only uses data types that converge despite some possible reordering of concurrent operations (i.e. concurrent ops must commute).
+RON implies causal consistency by default.
+Although, nothing prevents it from running in a linearized [ACIDic][peterb] or gossip environment.
+That only relaxes (or restricts) the choice of reducers.
 
-On the top of the RDT layer, there is a language-specific idiomatic API that hides all the op/state/metadata internals from the developer.
-The general concept of those APIs is that replicated data types must pretend to be plain simple local objects as much as possible.
-All the synchronization must happen automagically.
+## Wire format
 
-[smr]: https://www.cs.cornell.edu/fbs/publications/SMSurvey.pdf
+Design goals for the RON wire format is to be reasonably readable and reasonably compact.
+No less human-readable than regular expressions.
+No less compact than (say) three times plain JSON
+(and at least three times more compact than JSON with comparable amounts of metadata).
 
-## Network topology
+The syntax outline:
 
-Swarm picks the middle way of a super-peer network topology.
-Networks that are symmetric by design tend to display unavoidable stratification in practice (e.g. consider BitCoin miners and exchanges).
-Such a dynamics likely owes to Adam Smith's laws: economies of scale and specialization provide too much benefit to be ignored.
-Hence, the ideal of a fully symmetric peer-to-peer network appears to be not worth pursuing.
-Meanwhile, ACID databases have very clear scalability limits.
-Also, the classic ACID database design normally assumes a single (institutional) user.
-A linear-log system can hardly be ran otherwise.
-Consequently, they save on the who-when-why metadata.
+1. constants follow very predictable conventions:
+    * integers `1`
+    * e-notation floats `3.1415`, `1e+6`
+    * UTF-8 `"strings"`
+    * UID references `1D4ICC-XU5eRJ`
+2. UIDs use a compact custom serialization
+    * RON UIDs mostly correspond to v1 UUIDs (128 bit, globally unique, contains a timestamp and a process id)
+    * RON UIDs are Base64 to save space (compare [RFC4122][rfc4122] `123e4567-e89b-12d3-a456-426655440000` and RON `1D4ICC-XU5eRJ`)
+    * also, RON UIDs may vary in precision, like floats (no need to mention nanoseconds everywhere)
+3. serialized ops use some punctuation, e.g. `.lww #1D4ICC-XU5eRJ :keyA @1D4ICC2-XU5eRJ "valueA"`
+    * `.` starts a data type UID
+    * `#` starts an object UID
+    * `:` starts a location UID
+    * `@` starts an op's own UID
+    * `=` starts an integer
+    * `"` starts and ends a string
+    * `^` starts a float (e-notation)
+    * `>` starts a reference (UID)
+4. frame format employs cross-columnar compression
+    * repeated UIDs can be skipped altogether ("same as in the last op")
+    * RON abbreviates similar UIDs using prefix [compression](compression.md)
 
-Swarm *peers* connect to each other in an arbitrary fashion, the only requirement is that the graph should be connected most of the time.  
-Peers must keep a full database replica.
-*Clients* only connect to their *home* peers.
-Clients can pick their dataset on object-by-object basis.
-Client replicas are fully autonomous, can cache all the data locally and make writes while offline.
+Consider a JSON object `{"keyA":"valueA", "keyB":"valueB"}`.
+A RON frame for that object will have three ops: one header op and two key-value ops.
+If compressed, that frame may look like
+`.lww#1D4ICC-XU5eRJ@\{E\ :keyA"valueA" @{1:keyB"valueB"` -- just a bit more than the size of the bare JSON.
+That is impressive given the amount of metadata (and you can't replicate data correctly without the metadata).
+The frame takes less space than *two* [RFC4122 UUIDs][rfc4122]; but it contains *twelve* UIDs (6 distinct) and also the data!
 
-Every Swarm [op](op.md) is [timestamped](stamp.md) and attributed to its origin replica.
-Ops are immutable from the moment of creation (e.g. compare that to repeatedly-mutable [OT][ot] ops).
-Ops propagate without [causality](order.md) violations.
-Practically, that means a replica can only relay ops in the order they were received (the [*arrival* order](order.md)).
-
-One may argue that Swarm is neither a true database (no indexes, no query language) nor a true peer-to-peer network ([*peer* admission](peerage.md) is not completely open).
-That is certainly a trade-off and there are ways to overcome those issues (e.g. database integrations and open *client* admission).
-So, yet another way to describe Swarm is "like Kafka, but partially ordered, so it can work on the client and survive disconnections".
-That is the core of it: a replicated log service (and a key-value database on top).
-
-[ot]: https://en.wikipedia.org/wiki/Operational_transformation
 
 ## The math
 
-Swarm employs a variety of computer science models: state machine replication, Lamport logical time, sequential processes exchanging messages, Commutative Replicated Data Types.
-It relies on TCP sequential delivery and log-structured database guarantees.
+Swarm RON employs a variety of well-studied computer science models.
+The general flow of synchronization follows the state machine replication model,
+albeit [Commutative Replicated Data Types][crdt] enable partial orders.
+UIDs are essentially [Lamport logical timestamps][lamport], although they borrow a lot from RFC4122 UUIDs.
+RON wire format is a [regular language][regular].
+That makes it (formally) simpler than either JSON or XML.
 
-The core contribution of the Swarm protocol is *practicality*.
-It is possible to implement a CRDT-based database literally, along the definitions, but that will hardly be practical.
-Swarm arranges primitives in a way to make metadata overhead acceptable, a known hurdle in CRDT-based solutions.
-In particular, Swarm avoids the *explicit* use of version vectors.
-Those turn untenable when every client device runs its own replica.
-Swarm [op format](op.md) is made particularly lightweight ([string key](spec.md) - buffer value).
-That enables such realtime apps as collaborative text editors where one op is one keystroke.
 
-A good entry point to start studying the Swarm protocol is its [subscription handshakes](handshake.md).
+The core contribution of the RON format is *practicality*.
+RON arranges primitives in a way to make metadata overhead acceptable.
+Metadata was a known hurdle in CRDT-based solutions, as compared to e.g. [OT-family][ot] algorithms.
+Small overhead enables such real-time apps as collaborative text editors where one op is one keystroke.
+Hopefully, it will enable some yet-unknown applications as well.
 
-Use Swarm.
+Use Swarm RON!
 
 
 ### History
@@ -110,3 +137,26 @@ Use Swarm.
 * 2016 Feb: version 1.0 stabilizes (no v.vectors, new asymmetric client protocol)
 * 2016 May: version 1.1 gets peer-to-peer (server-to-server) sync
 * 2016 June: version 1.2 gets crypto (Merkle, entanglement)
+* 2016 October: functional generalizations (map/reduce)
+* 2016 December: cross-columnar compression
+
+[2sided]: http://lexicon.ft.com/Term?term=two_sided-markets
+[super]: http://ilpubs.stanford.edu:8090/594/1/2003-33.pdf
+[opbased]: http://haslab.uminho.pt/sites/default/files/ashoker/files/opbaseddais14.pdf
+[cap]: https://www.infoq.com/articles/cap-twelve-years-later-how-the-rules-have-changed
+[swarm]: https://gritzko.gitbooks.io/swarm-the-protocol/content/
+[po]: https://en.wikipedia.org/wiki/Partially_ordered_set#Formal_definition
+[crdt]: https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type
+[icn]: http://www.networkworld.com/article/3060243/internet/demystifying-the-information-centric-network.html
+[kafka]: http://kafka.apache.org
+[git]: https://git-scm.com
+[log]: http://blog.notdot.net/2009/12/Damn-Cool-Algorithms-Log-structured-storage
+[re]: https://blogs.msdn.microsoft.com/csliu/2009/11/10/mapreduce-in-functional-programming-parallel-processing-perspectives/
+[rfc4122]: https://tools.ietf.org/html/rfc4122
+[causal]: https://en.wikipedia.org/wiki/Causal_consistency
+[UID]: https://en.wikipedia.org/wiki/Universally_unique_identifier
+[peterb]: https://martin.kleppmann.com/2014/11/isolation-levels.png
+[regular]: https://en.wikipedia.org/wiki/Regular_language
+[mvc]: https://en.wikipedia.org/wiki/Model–view–controller
+[ot]: https://en.wikipedia.org/wiki/Operational_transformation
+[lamport]: http://lamport.azurewebsites.net/pubs/time-clocks.pdf
