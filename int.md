@@ -1,4 +1,4 @@
-## Base64x64 integers, timestamps and ids
+## RON integers, Base64x64
 
 Swarm RON employs lots of ids, timestamps and pre-defined constants all unified as 128-bit RON UIDs consisting of two 64-bit parts.
 64-bit integers are well supported on all platforms, with the notable exception of JavaScript. JavaScript numbers are [dangerous to use][snowflake] in this context.
@@ -8,17 +8,19 @@ Swarm RON Base64 variant satisfies two special requirements.
 First, RON has to do lots of causality-and-order comparisons with UIDs/timestamps.
 Hence, the natural alphanumeric ordering of Base64 strings must be the same as the original numeric order of integers.
 That rules out any common variety of Base64 from being used, as [Base64][base64] symbols do not go in their ASCII order.
-
 Second, full 64 bits is a bit too much sometimes, so a variable-length encoding is a must (see Google's [varints][varint]).
-
-Hence, RON employs the following Base64x64 encoding:
+Hence, RON employs the following "Base64x64" encoding:
 
 * 64-bit numbers are represented as ten Base64 chars (10x6=60, 4 higher bits are reserved),
 * our Base64 variety is `0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz~` (non-standard),
 * *tailing* zeroes are skipped, e.g. `1230000000` is shortened to `123`.
 
 The tail-skip rule is a bit counter-intuitive, as the normal Arabic notation skips *leading* zeroes, e.g. Arabic 0000123 is 123.
-But this way, the numeric order of `uint64_t` matches the alphanumeric order of our Base64, which is not the case with Arabic numbers.
+But this way, the numeric order of `uint64_t` matches the alphanumeric order of our Base64x64, which is not the case with Arabic numbers.
+This variable-length trick provides significant savings when Base64x64 numbers are concatenated.
+For example, an [op](op.md) has four [UIDs](uid.md), thus eight 64-bit integers (4x2x64=512 bits), plus separators.
+Still, it can be as short as `.db#test:1CQC2u3u+X` (19 chars).
+One 64-bit decimal number is up to 19 characters (9223372036854775807).
 
 So, Base64x64 is like [varint][varint], but for text-based formats and it preserves the order.  It is mostly used for [UIDs](uid.md), timestamps and identifiers.
 

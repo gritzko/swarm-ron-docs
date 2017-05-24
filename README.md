@@ -46,7 +46,7 @@ Swarm RON formal model has four key components:
     * ops are context-independent; an op specifies precisely its place, time and value
     * ops are immutable once created
     * ops assume [causally consistent][causal] delivery
-    * an op is a tuple of four [UIDs](uid.md) and one or more constants:
+    * an op is a tuple of four [UIDs](uid.md) and one or more constants ([atoms](op.md)):
         1. the data type UID,
         2. the object's UID,
         3. the location UID,

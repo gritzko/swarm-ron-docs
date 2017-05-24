@@ -1,13 +1,11 @@
-# UIDs #
+## UIDs
 
-Swarm RON UIDs are roughly equivalent to [RFC4122 Version 1 UUID][uuid].
+Swarm RON UIDs are roughly equivalent to [RFC4122 Version 1 UUIDs][uuid].
 These are 128-bit logical timestamps serving as globally unique identifiers to *anything*.
 RON UIDs employ different formats mostly to achieve better compression.
 
-Regular RON UIDs have two components: *time* and *origin*.
-The time part is calendar time, the origin part is a process/replica id.
+Regular RON UIDs have two components: *time* (calendar time) and *origin* (process/replica id).
 Both parts are [64-bit ints](int.md).
-
 Transcendent UIDs have origin of 0.
 Those are global constants precisely defined mathematically, hence independent of any origin or time.
 
@@ -17,9 +15,9 @@ Also, the full 128-bit bit capacity is often excessive, so unnecessary tail bits
 
 UIDs are serialized to Base64 as two [Base64x64 ints](int.md) using `-` as a pair separator, e.g. `1CQKneD1-X~` (time `1CQKneD1`, origin replica id `X~`).
 
-## Time part format
+### Time part format
 
-Swarm timestamps are based on the Gregorian calendar and not milliseconds-since-epoch because they are [hybrid][hybrid] (logical, but calendar-aware).
+Swarm timestamps are Gregorian calendar based, not milliseconds-since-epoch because they are [hybrid][hybrid] (logical, but calendar-aware).
 Intuitive understanding of timestamps is a higher priority than easy calculation of time intervals.
 
 Timestamp values have the `MMDHmSssnn` format.
@@ -32,15 +30,10 @@ The resulting resolution is ~4mln timestamps per second, which is often excessiv
 It is OK to shorten timestamps by zeroing the tail (sequence number, milliseconds, etc).
 For example, `1CQAneD` is 7 chars and `1CQAn` is 5 chars (`MMDHm`, no seconds - Fri May 27 20:50:00 UTC 2016)
 
-The variable-length trick provides significant savings when Base64 numbers are concatenated.
-For example, an op has 4 UIDs, thus eight 64-bit integers (4x2x64=512 bits), plus separators.
-Still, it can be as short as `.db#test:1CQC2u3u+X` (19 chars).
-One 64-bit decimal number is up to 19 characters (9223372036854775807).
-
 Time value of `~` means "infinity"/"never".
 Time value of `~~~~~~~~~~` means "error".
 
-## Origin part format
+### Origin part format
 
 In general, RON accepts any 60-bit globally unique replica identifiers.
 It is OK to use MAC addressses or random numbers.
@@ -52,7 +45,7 @@ For example, in the [0163 scheme](replica.md), replica id `Xgritzk0_D` has serve
 Theoretically, Swarm RON UIDs are based on a product of two very basic models: Lamport timestamps and process trees.
 It is like sequential processes (replicas) exchanging messages asynchronously AND those processes can fork off child replicas.
 
-## Transcendent UID format
+### Transcendent UID format
 
 Transcendent values use arbitrary 60-bit values.
 Typically, those are short human-readable strings in [Base64x64](int.md), e.g. `inc`, `sum`, `txt` and so on.
