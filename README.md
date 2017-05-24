@@ -28,9 +28,9 @@ With RON, every #object, @version, :location or .type has its own explicit [UID]
 That way, RON can join pieces of data correctly.
 Suppose, in the above example, `bar` was changed to `2`.
 There is no way to convey that in JSON, short of serializing the entire new state.
-Once your dataset is bigger than HTTP headers, incremental RON updates are definitely more efficient: `.lww#time1-userA@time3\ :bar=2`.
+Once your dataset is bigger than HTTP headers, incremental RON updates may turn more efficient: `.lww#time1-userA@time3\ :bar=2`.
 UIDs enable complex data graph structures (not just simple nesting), incremental data updates, unlimited caching, conflict resolution and other RON superpowers.
-One may say, RON metadata solves both naming things and cache invalidation.
+One may say, what RON metadata solves is naming things and cache invalidation.
 
 RON makes no strong assumptions about consistency guarantees: linearized, causal-order or gossip environments are all fine.
 Once all the object's ops are propagated to all the object's replicas, replicas converge to the same state.
@@ -115,7 +115,7 @@ The frame takes less space than *two* [RFC4122 UUIDs][rfc4122]; but it contains 
 
 Swarm RON employs a variety of well-studied computer science models.
 The general flow of RON data synchronization follows the state machine replication model.
-Offline writability, real-time sync and conflict resolution are all possible thanls to [Commutative Replicated Data Types][crdt] and [partially ordered][po] op logs.
+Offline writability, real-time sync and conflict resolution are all possible thanks to [Commutative Replicated Data Types][crdt] and [partially ordered][po] op logs.
 UIDs are essentially [Lamport logical timestamps][lamport], although they borrow a lot from RFC4122 UUIDs.
 RON wire format is a [regular language][regular].
 That makes it (formally) simpler than either JSON or XML.
