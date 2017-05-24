@@ -38,7 +38,7 @@ For the text-based serialization, constants follow very predictable conventions:
 1. integers `=1`, `=-3` (any integer up to JavaScript Number.MAX_SAFE_INTEGER),
 2. e-notation floats: `^3.1415`, `^1e+6` (explicitly separated from integers due to the fact that float arithmetics is non-associative),
 3. UTF-8 JSON-escaped strings: `"строка\n线\t\u7ebf\n라인"`,
-4. UID references `>1D4ICC-XU5eRJ`, `>1D4ICC-XU5eRJ[E{` (either one UID or an array of UIDs using the [bracket notation for prefix compression](compression.md)),
+4. UID references `>1D4ICC-XU5eRJ`, `>1D4ICC-XU5eRJ[E{` (either one UID or an array of UIDs using the [bracket notation](compression.md) for prefix compression),
 5. void values of `!` and `?` mark [header ops](frame.md) and [subscription ops](subscription.md) that typically have no value.
 
 ```

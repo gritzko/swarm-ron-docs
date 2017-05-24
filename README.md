@@ -99,7 +99,7 @@ The syntax outline:
     * `"` starts and ends a string
     * `^` starts a float (e-notation)
     * `>` starts a reference (UID)
-4. frame format employs cross-columnar compression
+4. frame format employs cross-columnar [compression](compression.md)
     * repeated UIDs can be skipped altogether ("same as in the last op")
     * RON abbreviates similar UIDs using [prefix compression](compression.md), e.g. `@1D4ICCE-XU5eRJ` gets compressed to `@\{E\` if preceded by `#1D4ICC-XU5eRJ`
 
