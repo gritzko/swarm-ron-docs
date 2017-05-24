@@ -1,20 +1,19 @@
 # Swarm Replicated Object Notation 2.0.0 #
 [*see on GitBooks: PDF, ebook, etc*](https://gritzko.gitbooks.io/swarm-the-protocol)
 
-Swarm Replicated Object Notation is a distributed data format.
-It is designed to synchronize massively replicated datasets.
+Swarm Replicated Object Notation is a distributed data format
+designed to synchronize massively replicated datasets.
+It is a text-based data format, much like XML or JSON.
+While XML and JSON focus on serializing lumps of state, RON serializes a stream of changes (operations, "ops").
+Even an object's state is seen as a batch of compacted ops (a "frame").
+
 RON is [log-structured][log]: it sees data as a stream of changes (think [Kafka][kafka]).
 RON is [information-centric][icn]: the data is independent of its place of storage (think [git][git]).
 RON is CRDT-friendly; [Conflict-free Replicated Data Types][crdt] enable real-time data sync (think Google Docs).
 
-RON is neither an "app" nor a "framework". It is a text-based data format, much like XML or JSON.
-While XML and JSON focus on serializing lumps of state, RON serializes a stream of changes.
-Even an object's state is represented as a batch of compacted changes.
-
-RON change records (ops) are self-contained and context-independent.
-For example, JSON expresses relations by element positioning:
+Consider JSON. It expresses relations by element positioning:
 `{ "foo": {"bar": 1} }` (inside foo, bar equals 1).
-RON may express that fact as:
+RON may express that state as:
 ```
 .lww#time1-userA@\\ :bar=1
 #root@time2-userB   :foo>time1-userA
@@ -22,13 +21,15 @@ RON may express that fact as:
 Those are two RON ops.
 First, some object has a field "bar" set to 1.
 Second, another object has a field "foo" set to the first object.
+RON ops are self-contained and context-independent.
+Each change is versioned and attributed (e.g. at time `time2`, `userB` set `foo` to `time1-userA`).
 
-JSON serializes state snapshots.
-RON serializes streams of changes where each change is versioned and attributed (e.g. at time `time2`, `userB` set `foo` to `time1-userA`).
 With RON, every #object, @version, :location or .type has its own explicit [UID](uid.md), so it can be referenced later unambiguously.
-
-RON focuses on mobile devices.
-The metadata enables client-side replicas to synchronize incrementally and to stay writeable offline.
+That way, RON can join pieces of data correctly.
+Suppose, in the above example, `bar` was changed to `2`.
+There is no way to convey that in JSON, short of serializing the entire new state.
+Once your dataset is bigger than HTTP headers, incremental RON updates are definitely more efficient: `.lww#time1-userA@time3\ :bar=2`.
+UIDs enable complex data graph structures (not just simple nesting), incremental data updates, unlimited caching, conflict resolution and other RON superpowers.
 One may say, RON metadata solves both naming things and cache invalidation.
 
 RON makes no strong assumptions about consistency guarantees: linearized, causal-order or gossip environments are all fine.
@@ -39,7 +40,7 @@ RON wire format makes this process efficient.
 
 ## Formal model
 
-RON formal model has four key components:
+Swarm RON formal model has four key components:
 
 1. an [op](op.md) is an atomic unit of data change
     * ops are context-independent; an op specifies precisely its place, time and value
@@ -113,8 +114,8 @@ The frame takes less space than *two* [RFC4122 UUIDs][rfc4122]; but it contains 
 ## The math
 
 Swarm RON employs a variety of well-studied computer science models.
-The general flow of RON data synchronization follows the state machine replication model,
-albeit [Commutative Replicated Data Types][crdt] enable partial orders.
+The general flow of RON data synchronization follows the state machine replication model.
+Offline writability, real-time sync and conflict resolution are all possible thanls to [Commutative Replicated Data Types][crdt] and [partially ordered][po] op logs.
 UIDs are essentially [Lamport logical timestamps][lamport], although they borrow a lot from RFC4122 UUIDs.
 RON wire format is a [regular language][regular].
 That makes it (formally) simpler than either JSON or XML.
