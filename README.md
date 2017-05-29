@@ -98,7 +98,7 @@ The syntax outline:
     * integers `1`
     * e-notation floats: `3.1415`, `1e+6`
     * UTF-8 JSON-escaped strings: `"строка\n线\t\u7ebf\n라인"`
-    * UUID references `1D4ICC-XU5eRJ`
+    * UUIDs `1D4ICC-XU5eRJ 1D4ICCE-XU5eRJ`
 2. UUIDs use a compact custom serialization
     * RON UUIDs mostly correspond to v1 UUUIDs (128 bit, globally unique, contains a timestamp and a process id)
     * RON UUIDs are Base64 to save space (compare [RFC4122][rfc4122] `123e4567-e89b-12d3-a456-426655440000` and RON `1D4ICC-XU5eRJ`)
@@ -111,7 +111,7 @@ The syntax outline:
     * `=` starts an integer
     * `"` starts and ends a string
     * `^` starts a float (e-notation)
-    * `>` starts a reference (UUID)
+    * `>` starts an UUID, UUID array or a version vector (same format)
 4. frame format employs cross-columnar [compression](compression.md)
     * repeated UUIDs can be skipped altogether ("same as in the last op")
     * RON abbreviates similar UUIDs using [prefix compression](compression.md), e.g. `1D4ICCE-XU5eRJ` gets compressed to `{E` if preceded by `1D4ICC-XU5eRJ`
