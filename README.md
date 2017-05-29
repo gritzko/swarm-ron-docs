@@ -100,7 +100,7 @@ The syntax outline:
     * UTF-8 JSON-escaped strings: `"строка\n线\t\u7ebf\n라인"`
     * UUIDs `1D4ICC-XU5eRJ 1D4ICCE-XU5eRJ`
 2. UUIDs use a compact custom serialization
-    * RON UUIDs mostly correspond to v1 UUUIDs (128 bit, globally unique, contains a timestamp and a process id)
+    * RON UUIDs mostly correspond to v1 UUIDs (128 bit, globally unique, contains a timestamp and a process id)
     * RON UUIDs are Base64 to save space (compare [RFC4122][rfc4122] `123e4567-e89b-12d3-a456-426655440000` and RON `1D4ICC-XU5eRJ`)
     * also, RON UUIDs may vary in precision, like floats (no need to mention nanoseconds everywhere)
 3. serialized ops use some punctuation, e.g. `.lww #1D4ICC-XU5eRJ :keyA @1D4ICC2-XU5eRJ "valueA"`
@@ -121,7 +121,7 @@ A RON frame for that object will have three ops: one header op and two key-value
 If compressed, that frame may look like
 `.lww#1D4ICC-XU5eRJ|{E! :keyA"valueA" @{1:keyB"valueB"` -- just a bit more than the size of the bare JSON.
 That is impressive given the amount of metadata (and you can't replicate data correctly without the metadata).
-The frame takes less space than *two* [RFC4122 UUUIDs][rfc4122]; but it contains *twelve* UUIDs (6 distinct UUIDs, 3 distinct timestamps) and also the data.
+The frame takes less space than *two* [RFC4122 UUIDs][rfc4122]; but it contains *twelve* UUIDs (6 distinct UUIDs, 3 distinct timestamps) and also the data.
 
 
 ## The math
@@ -129,7 +129,7 @@ The frame takes less space than *two* [RFC4122 UUUIDs][rfc4122]; but it contains
 Swarm RON employs a variety of well-studied computer science models.
 The general flow of RON data synchronization follows the state machine replication model.
 Offline writability, real-time sync and conflict resolution are all possible thanks to [Commutative Replicated Data Types][crdt] and [partially ordered][po] op logs.
-UUIDs are essentially [Lamport logical timestamps][lamport], although they borrow a lot from RFC4122 UUUIDs.
+UUIDs are essentially [Lamport logical timestamps][lamport], although they borrow a lot from RFC4122 UUIDs.
 RON wire format is a [regular language][regular].
 That makes it (formally) simpler than either JSON or XML.
 
