@@ -1,36 +1,49 @@
 # Swarm Replicated Object Notation 2.0.0 #
 [*see on GitBooks: PDF, ebook, etc*](https://gritzko.gitbooks.io/swarm-the-protocol)
 
-Swarm Replicated Object Notation is a distributed data format
-designed to synchronize massively replicated datasets.
-It is a text-based data format, much like XML or JSON.
-While XML and JSON focus on serializing lumps of state, RON serializes a stream of changes (operations, "ops").
-Even an object's state is seen as a batch of compacted ops (a "frame").
+Swarm Replicated Object Notation is a distributed data serialization format.
+Implicitly, formats like XML or JSON assume a lump of state being delivered from a server to a client -- once and in one piece.
+RON aims to synchronize *replicas* by delivering a stream of changes -- continuously and incrementally.
+With RON, even an object's state is seen as a batch of compacted changes, with more changes coming.
 
-RON is [log-structured][log]: it sees data as a stream of changes (think [Kafka][kafka]).
-RON is [information-centric][icn]: the data is independent of its place of storage (think [git][git]).
+In the RON world, the source of truth is not some central storage, but a swarm of devices producing and processing data continuously.
+These devices cache their data and synchronize it in real time over faulty channels.
+
+RON is [log-structured][log]: it sees data as a stream of changes first, everything else second (think [Kafka][kafka]).
+RON is [information-centric][icn]: the data is addressed independently of its place of storage (think [git][git]).
 RON is CRDT-friendly; [Conflict-free Replicated Data Types][crdt] enable real-time data sync (think Google Docs).
 
 Consider JSON. It expresses relations by element positioning:
 `{ "foo": {"bar": 1} }` (inside foo, bar equals 1).
 RON may express that state as:
 ```
-.lww#time1-userA@\\ :bar=1
+.lww#time1-userA||  :bar=1
 #root@time2-userB   :foo>time1-userA
 ```
-Those are two RON ops.
+Those are two RON *ops*.
 First, some object has a field "bar" set to 1.
 Second, another object has a field "foo" set to the first object.
 RON ops are self-contained and context-independent.
 Each change is versioned and attributed (e.g. at time `time2`, `userB` set `foo` to `time1-userA`).
 
-With RON, every #object, @version, :location or .type has its own explicit [UID](uid.md), so it can be referenced later unambiguously.
-That way, RON can join pieces of data correctly.
+With RON, every #object, @version, :location or .type has its own explicit [UUID](uid.md), so it can be referenced later unambiguously.
+That way, RON can relate pieces of data correctly.
 Suppose, in the above example, `bar` was changed to `2`.
-There is no way to convey that in JSON, short of serializing the entire new state.
-Once your dataset is bigger than HTTP headers, incremental RON updates may turn more efficient: `.lww#time1-userA@time3\ :bar=2`.
-UIDs enable complex data graph structures (not just simple nesting), incremental data updates, unlimited caching, conflict resolution and other RON superpowers.
-One may say, what RON metadata solves is naming things and cache invalidation.
+There is no way to convey that in plain JSON, short of serializing the entire new state.
+Incremental RON updates are straightforward: `.lww#time1-userA@time3| :bar=2`.
+
+Thanks to that UUID metadata, RON can:
+
+* serialize complex data graphs,
+* perform incremental data updates,
+* maintain caches,
+* do offline writes,
+* resolve conflicts,
+* blend data from different sources,
+* overcome network failures and so on and so forth.
+
+One may say, what metadata solves is [naming things and cache invalidation][2problems].
+What RON solves is compressing that metadata.
 
 RON makes no strong assumptions about consistency guarantees: linearized, causal-order or gossip environments are all fine.
 Once all the object's ops are propagated to all the object's replicas, replicas converge to the same state.
@@ -46,12 +59,12 @@ Swarm RON formal model has four key components:
     * ops are context-independent; an op specifies precisely its place, time and value
     * ops are immutable once created
     * ops assume [causally consistent][causal] delivery
-    * an op is a tuple of four [UIDs](uid.md) and one or more constants ([atoms](op.md)):
-        1. the data type UID,
-        2. the object's UID,
-        3. the location UID,
-        4. the op's own UID,
-        5. constants are strings, integers, floats or references ([UIDs](uid.md)).
+    * an op is a tuple of four [UUIDs](uid.md) and one or more constants ([atoms](op.md)):
+        1. the data type UUID,
+        2. the object's UUID,
+        3. the location UUID,
+        4. the op's own UUID,
+        5. constants are strings, integers, floats or references ([UUIDs](uid.md)).
 2. a [frame](frame.md) is a batch of ops
     * an object's state is a frame
     * a "patch" (aka "delta", "diff") is also a frame
@@ -85,30 +98,30 @@ The syntax outline:
     * integers `1`
     * e-notation floats: `3.1415`, `1e+6`
     * UTF-8 JSON-escaped strings: `"строка\n线\t\u7ebf\n라인"`
-    * UID references `1D4ICC-XU5eRJ`
-2. UIDs use a compact custom serialization
-    * RON UIDs mostly correspond to v1 UUIDs (128 bit, globally unique, contains a timestamp and a process id)
-    * RON UIDs are Base64 to save space (compare [RFC4122][rfc4122] `123e4567-e89b-12d3-a456-426655440000` and RON `1D4ICC-XU5eRJ`)
-    * also, RON UIDs may vary in precision, like floats (no need to mention nanoseconds everywhere)
+    * UUID references `1D4ICC-XU5eRJ`
+2. UUIDs use a compact custom serialization
+    * RON UUIDs mostly correspond to v1 UUUIDs (128 bit, globally unique, contains a timestamp and a process id)
+    * RON UUIDs are Base64 to save space (compare [RFC4122][rfc4122] `123e4567-e89b-12d3-a456-426655440000` and RON `1D4ICC-XU5eRJ`)
+    * also, RON UUIDs may vary in precision, like floats (no need to mention nanoseconds everywhere)
 3. serialized ops use some punctuation, e.g. `.lww #1D4ICC-XU5eRJ :keyA @1D4ICC2-XU5eRJ "valueA"`
-    * `.` starts a data type UID
-    * `#` starts an object UID
-    * `:` starts a location UID
-    * `@` starts an op's own UID
+    * `.` starts a data type UUID
+    * `#` starts an object UUID
+    * `:` starts a location UUID
+    * `@` starts an op's own UUID
     * `=` starts an integer
     * `"` starts and ends a string
     * `^` starts a float (e-notation)
-    * `>` starts a reference (UID)
+    * `>` starts a reference (UUID)
 4. frame format employs cross-columnar [compression](compression.md)
-    * repeated UIDs can be skipped altogether ("same as in the last op")
-    * RON abbreviates similar UIDs using [prefix compression](compression.md), e.g. `@1D4ICCE-XU5eRJ` gets compressed to `@\{E\` if preceded by `#1D4ICC-XU5eRJ`
+    * repeated UUIDs can be skipped altogether ("same as in the last op")
+    * RON abbreviates similar UUIDs using [prefix compression](compression.md), e.g. `1D4ICCE-XU5eRJ` gets compressed to `{E` if preceded by `1D4ICC-XU5eRJ`
 
 Consider a JSON object `{"keyA":"valueA", "keyB":"valueB"}`.
 A RON frame for that object will have three ops: one header op and two key-value ops.
 If compressed, that frame may look like
-`.lww#1D4ICC-XU5eRJ@\{E\! :keyA"valueA" @{1:keyB"valueB"` -- just a bit more than the size of the bare JSON.
+`.lww#1D4ICC-XU5eRJ@|{E|! :keyA"valueA" @{1:keyB"valueB"` -- just a bit more than the size of the bare JSON.
 That is impressive given the amount of metadata (and you can't replicate data correctly without the metadata).
-The frame takes less space than *two* [RFC4122 UUIDs][rfc4122]; but it contains *twelve* UIDs (6 distinct) and also the data.
+The frame takes less space than *two* [RFC4122 UUUIDs][rfc4122]; but it contains *twelve* UUIDs (6 distinct) and also the data.
 
 
 ## The math
@@ -116,7 +129,7 @@ The frame takes less space than *two* [RFC4122 UUIDs][rfc4122]; but it contains 
 Swarm RON employs a variety of well-studied computer science models.
 The general flow of RON data synchronization follows the state machine replication model.
 Offline writability, real-time sync and conflict resolution are all possible thanks to [Commutative Replicated Data Types][crdt] and [partially ordered][po] op logs.
-UIDs are essentially [Lamport logical timestamps][lamport], although they borrow a lot from RFC4122 UUIDs.
+UUIDs are essentially [Lamport logical timestamps][lamport], although they borrow a lot from RFC4122 UUUIDs.
 RON wire format is a [regular language][regular].
 That makes it (formally) simpler than either JSON or XML.
 
@@ -157,9 +170,10 @@ Use Swarm RON!
 [re]: https://blogs.msdn.microsoft.com/csliu/2009/11/10/mapreduce-in-functional-programming-parallel-processing-perspectives/
 [rfc4122]: https://tools.ietf.org/html/rfc4122
 [causal]: https://en.wikipedia.org/wiki/Causal_consistency
-[UID]: https://en.wikipedia.org/wiki/Universally_unique_identifier
+[UUID]: https://en.wikipedia.org/wiki/Universally_unique_identifier
 [peterb]: https://martin.kleppmann.com/2014/11/isolation-levels.png
 [regular]: https://en.wikipedia.org/wiki/Regular_language
 [mvc]: https://en.wikipedia.org/wiki/Model–view–controller
 [ot]: https://en.wikipedia.org/wiki/Operational_transformation
 [lamport]: http://lamport.azurewebsites.net/pubs/time-clocks.pdf
+[2problems]: https://martinfowler.com/bliki/TwoHardThings.html
