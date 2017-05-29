@@ -17,7 +17,7 @@ Consider JSON. It expresses relations by element positioning:
 `{ "foo": {"bar": 1} }` (inside foo, bar equals 1).
 RON may express that state as:
 ```
-.lww#time1-userA||  :bar=1
+.lww#time1-userA|   :bar=1
 #root@time2-userB   :foo>time1-userA
 ```
 Those are two RON *ops*.
@@ -30,7 +30,7 @@ With RON, every #object, @version, :location or .type has its own explicit [UUID
 That way, RON can relate pieces of data correctly.
 Suppose, in the above example, `bar` was changed to `2`.
 There is no way to convey that in plain JSON, short of serializing the entire new state.
-Incremental RON updates are straightforward: `.lww#time1-userA@time3| :bar=2`.
+Incremental RON updates are straightforward: `.lww#time1-userA@time3-userA :bar=2` (if compressed, `.lww#time1-userA|(3:bar=2`).
 
 Thanks to that UUID metadata, RON can:
 
@@ -119,7 +119,7 @@ The syntax outline:
 Consider a JSON object `{"keyA":"valueA", "keyB":"valueB"}`.
 A RON frame for that object will have three ops: one header op and two key-value ops.
 If compressed, that frame may look like
-`.lww#1D4ICC-XU5eRJ@|{E|! :keyA"valueA" @{1:keyB"valueB"` -- just a bit more than the size of the bare JSON.
+`.lww#1D4ICC-XU5eRJ|{E! :keyA"valueA" @{1:keyB"valueB"` -- just a bit more than the size of the bare JSON.
 That is impressive given the amount of metadata (and you can't replicate data correctly without the metadata).
 The frame takes less space than *two* [RFC4122 UUUIDs][rfc4122]; but it contains *twelve* UUIDs (6 distinct) and also the data.
 
