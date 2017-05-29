@@ -6,10 +6,10 @@ Implicitly, formats like XML or JSON assume a lump of state being delivered from
 RON aims to synchronize *replicas* by delivering a stream of changes -- continuously and incrementally.
 With RON, even an object's state is seen as a batch of compacted changes, with more changes coming.
 
-In the RON world, the source of truth is not some central storage, but a swarm of devices producing and processing data continuously.
+In the RON world, the source of truth is not some central storage, but a swarm of devices, each producing and processing data continuously.
 These devices cache their data and synchronize it in real time over faulty channels.
 
-RON is [log-structured][log]: it sees data as a stream of changes first, everything else second (think [Kafka][kafka]).
+RON is [log-structured][log]: it stores data as a stream of changes first, everything else second (think [Kafka][kafka]).
 RON is [information-centric][icn]: the data is addressed independently of its place of storage (think [git][git]).
 RON is CRDT-friendly; [Conflict-free Replicated Data Types][crdt] enable real-time data sync (think Google Docs).
 
@@ -30,7 +30,7 @@ With RON, every #object, @version, :location or .type has its own explicit [UUID
 That way, RON can relate pieces of data correctly.
 Suppose, in the above example, `bar` was changed to `2`.
 There is no way to convey that in plain JSON, short of serializing the entire new state.
-Incremental RON updates are straightforward: `.lww#time1-userA@time3-userA :bar=2` (if compressed, `.lww#time1-userA|(3:bar=2`).
+Incremental RON updates are straightforward: `.lww#time1-userA@time3-userA :bar=2`. If compressed: `.lww#time1-userA|(3:bar=2`.
 
 Thanks to that UUID metadata, RON can:
 
@@ -62,8 +62,8 @@ Swarm RON formal model has four key components:
     * an op is a tuple of four [UUIDs](uid.md) and one or more constants ([atoms](op.md)):
         1. the data type UUID,
         2. the object's UUID,
-        3. the location UUID,
-        4. the op's own UUID,
+        3. the op's own event UUID,
+        4. the location UUID,
         5. constants are strings, integers, floats or references ([UUIDs](uid.md)).
 2. a [frame](frame.md) is a batch of ops
     * an object's state is a frame
@@ -106,8 +106,8 @@ The syntax outline:
 3. serialized ops use some punctuation, e.g. `.lww #1D4ICC-XU5eRJ :keyA @1D4ICC2-XU5eRJ "valueA"`
     * `.` starts a data type UUID
     * `#` starts an object UUID
+    * `@` starts an op's own event UUID
     * `:` starts a location UUID
-    * `@` starts an op's own UUID
     * `=` starts an integer
     * `"` starts and ends a string
     * `^` starts a float (e-notation)
@@ -121,7 +121,7 @@ A RON frame for that object will have three ops: one header op and two key-value
 If compressed, that frame may look like
 `.lww#1D4ICC-XU5eRJ|{E! :keyA"valueA" @{1:keyB"valueB"` -- just a bit more than the size of the bare JSON.
 That is impressive given the amount of metadata (and you can't replicate data correctly without the metadata).
-The frame takes less space than *two* [RFC4122 UUUIDs][rfc4122]; but it contains *twelve* UUIDs (6 distinct) and also the data.
+The frame takes less space than *two* [RFC4122 UUUIDs][rfc4122]; but it contains *twelve* UUIDs (6 distinct UUIDs, 3 distinct timestamps) and also the data.
 
 
 ## The math
