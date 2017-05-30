@@ -9,10 +9,6 @@ With RON, even an object's state is seen as a batch of compacted changes, with m
 In the RON world, the source of truth is not some central storage, but a swarm of devices, each producing and processing data continuously.
 These devices cache their data and synchronize it in real time over faulty channels.
 
-RON is [log-structured][log]: it stores data as a stream of changes first, everything else second (think [Kafka][kafka]).
-RON is [information-centric][icn]: the data is addressed independently of its place of storage (think [git][git]).
-RON is CRDT-friendly; [Conflict-free Replicated Data Types][crdt] enable real-time data sync (think Google Docs).
-
 Consider JSON. It expresses relations by element positioning:
 `{ "foo": {"bar": 1} }` (inside foo, bar equals 1).
 RON may express that state as:
@@ -126,13 +122,17 @@ The frame takes less space than *two* [RFC4122 UUIDs][rfc4122]; but it contains 
 
 ## The math
 
+RON is [log-structured][log]: it stores data as a stream of changes first, everything else second (think [Kafka][kafka]).
+Algorithmically, RON is LSMT-friendly (think [BigTable and friends][lsmt]).
+RON is [information-centric][icn]: the data is addressed independently of its place of storage (think [git][git]).
+RON is CRDT-friendly; [Conflict-free Replicated Data Types][crdt] enable real-time data sync (think Google Docs).
+
 Swarm RON employs a variety of well-studied computer science models.
 The general flow of RON data synchronization follows the state machine replication model.
 Offline writability, real-time sync and conflict resolution are all possible thanks to [Commutative Replicated Data Types][crdt] and [partially ordered][po] op logs.
 UUIDs are essentially [Lamport logical timestamps][lamport], although they borrow a lot from RFC4122 UUIDs.
 RON wire format is a [regular language][regular].
 That makes it (formally) simpler than either JSON or XML.
-
 
 The core contribution of the RON format is *practicality*.
 RON arranges primitives in a way to make metadata overhead acceptable.
@@ -177,3 +177,4 @@ Use Swarm RON!
 [ot]: https://en.wikipedia.org/wiki/Operational_transformation
 [lamport]: http://lamport.azurewebsites.net/pubs/time-clocks.pdf
 [2problems]: https://martinfowler.com/bliki/TwoHardThings.html
+[lsmt]: https://en.wikipedia.org/wiki/Log-structured_merge-tree
