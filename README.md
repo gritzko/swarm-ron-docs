@@ -30,13 +30,14 @@ Incremental RON updates are straightforward: `.lww#time1-userA@time3-userA :bar=
 
 Thanks to that UUID metadata, RON can:
 
-* serialize complex data graphs,
-* perform incremental data updates,
-* maintain caches,
-* do offline writes,
-* resolve conflicts,
-* blend data from different sources,
-* overcome network failures and so on and so forth.
+* serialize complex data graphs (beyond simple nesting),
+* maintain caches (thanks to object UUIDs),
+* perform incremental data updates (thanks to version UUIDs),
+* do offline writes (UUIDs are coordination-free),
+* resolve conflicts (using Last-Write-Wins, CRDT or other strategy),
+* blend data from different sources (UUIDs are global),
+* overcome network failures (UUIDs enabe acknowledgements and idempotency),
+* ...and so on and so forth.
 
 One may say, what metadata solves is [naming things and cache invalidation][2problems].
 What RON solves is compressing that metadata.
