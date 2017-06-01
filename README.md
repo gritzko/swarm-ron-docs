@@ -109,14 +109,26 @@ The syntax outline:
     * `"` starts and ends a string
     * `^` starts a float (e-notation)
     * `>` starts an UUID, UUID array or a version vector (same format)
+    * `!` marks a frame header
+    * `?` marks a query header
 4. frame format employs cross-columnar [compression](compression.md)
     * repeated UUIDs can be skipped altogether ("same as in the last op")
     * RON abbreviates similar UUIDs using [prefix compression](compression.md), e.g. `1D4ICCE-XU5eRJ` gets compressed to `{E` if preceded by `1D4ICC-XU5eRJ`
 
 Consider a JSON object `{"keyA":"valueA", "keyB":"valueB"}`.
 A RON frame for that object will have three ops: one header op and two key-value ops.
-If compressed, that frame may look like
-`.lww#1D4ICC-XU5eRJ|{E! :keyA"valueA" @{1:keyB"valueB"` -- just a bit more than the size of the bare JSON.
+In tabular form, those three ops will look like this:
+```
+type object         event           location value
+-----------------------------------------------------
+.lww #1D4ICC-XU5eRJ @1D4ICCE-XU5eRJ          !
+.lww #1D4ICC-XU5eRJ @1D4ICCE-XU5eRJ :keyA    "valueA"
+.lww #1D4ICC-XU5eRJ @1D4ICC1-XU5eRJ :keyB    "valueB"
+```
+There are lots of repeating bits here.
+We may skip repeating UUIDs and prefix-compress close UUIDs.
+A compressed frame will look like
+`.lww#1D4ICC-XU5eRJ|{E! :keyA"valueA" @{1:keyB"valueB"` -- not much more than the size of the bare JSON.
 That is impressive given the amount of metadata (and you can't replicate data correctly without the metadata).
 The frame takes less space than *two* [RFC4122 UUIDs][rfc4122]; but it contains *twelve* UUIDs (6 distinct UUIDs, 3 distinct timestamps) and also the data.
 
