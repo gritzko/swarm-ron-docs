@@ -118,7 +118,7 @@ The syntax outline:
 Consider a JSON object 
 `{"keyA":"valueA", "keyB":"valueB"}`.
 A RON frame for that object will have three ops: one frame header op and two key-value ops.
-In tabular form, that frame will look like:
+In tabular form, that frame may look like:
 ```
 type object         event           location value
 -----------------------------------------------------
@@ -128,11 +128,18 @@ type object         event           location value
 ```
 There are lots of repeating bits here.
 We may skip repeating UUIDs and prefix-compress close UUIDs.
-Then, a compressed frame will look like
+The compressed frame will look like:
 `.lww#1D4ICC-XU5eRJ|{E! :keyA"valueA" @{1:keyB"valueB"` -- a bit longer than bare JSON.
 That is impressive given the amount of metadata (and you can't replicate data correctly without the metadata).
 The frame takes less space than *two* [RFC4122 UUIDs][rfc4122]; but it contains *twelve* UUIDs (6 distinct UUIDs, 3 distinct timestamps) and also the data.
+The point becomes even clearer if we add the same object UUID to JSON using the RFC4122 notation:
+`{"_id": "0651a600-2b49-11e6-8000-1696d3000000", "keyA":"valueA", "keyB":"valueB"}`.
 
+We may take this to the extreme if we consider the case of a CRDT-based collaborative real-time editor.
+Then, every letter in the text has its own UUID.
+With RFC4122 UUIDs and JSON, that is simply ridiculous. That is painful to imagine!
+With RON, that is perfectly OK.
+So, let's be precise. Let's put UUIDs on everything.
 
 ## The math
 
