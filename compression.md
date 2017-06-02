@@ -13,6 +13,6 @@ A Base64 RON serializer may use any of the following compression tricks:
 
 1. VARLEN - skip tailing zeroes in every [int](int.md), e.g. `time123000-origin0000` becomes `time123-origin`,
 2. SKIPTOK (op key only) - entirely skip tokens if they are equal to defaults, e.g. in an object state frame only the first op has type/object ids: `.lww#1D4ICC-XU5eRJ@1D4ICCE-XU5eRJ! :keyA"valueA" @{1:keyB"valueB"`
-3. PREFIX - replace common prefixes by "bracket" symbols (these are `([{}])` for 4,5,6,7,8,9 chars respectively), e.g. `time1-orig time2-orig` becomes `time1-orig(2(`
-4. REDEFAULT (op key only) - use a different UUID as the default value for prefix compression, e.g. `.lww#1D4ICC-XU5eRJ@\{E\!` uses the object id as the default for the op id (here `\` means "left" and `/` means "right" redefault; a right redefault will point to the location id in the previous op instead)
+3. PREFIX - replace common prefixes by "bracket" symbols: `([{}])` for 4,5,6,7,8,9 chars respectively, e.g. `time1-orig time2-orig` becomes `time1-orig(2`
+4. REDEFAULT (op key only) - use a different UUID as the default value for prefix compression, e.g. ```.lww#1D4ICC-XU5eRJ@`{E!``` where event id defaults to the object id (symbols `\|/` point to object, event and location ids of the last op; backtick points to the preceding id in the same op)
 5. SKIPQUANT - skip unnecessary separators, e.g. `.lww#1D4ICC-XU5eRJ\{E\!` skips `@` as the UID after the object id should be the op id anyway.

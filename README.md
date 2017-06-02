@@ -13,7 +13,7 @@ Consider JSON. It expresses relations by element positioning:
 `{ "foo": {"bar": 1} }` (inside foo, bar equals 1).
 RON may express that state as:
 ```
-.lww#time1-userA<   :bar=1
+.lww#time1-userA`   :bar=1
 #root@time2-userB   :foo>time1-userA
 ```
 Those are two RON *ops*.
@@ -26,7 +26,7 @@ With RON, every #object, @version, :location or .type has its own explicit [UUID
 That way, RON can relate pieces of data correctly.
 Suppose, in the above example, `bar` was changed to `2`.
 There is no way to convey that in plain JSON, short of serializing the entire new state.
-Incremental RON updates are straightforward: `.lww#time1-userA@time3-userA :bar=2`. If compressed: `.lww#time1-userA<(3:bar=2`.
+Incremental RON updates are straightforward: `.lww#time1-userA@time3-userA :bar=2`. If compressed: ```.lww#time1-userA`(3:bar=2```.
 
 Thanks to that UUID metadata, RON can:
 
@@ -115,7 +115,7 @@ The syntax outline:
     * repeated UUIDs can be skipped altogether ("same as in the last op")
     * RON abbreviates similar UUIDs using [prefix compression](compression.md), e.g. `1D4ICCE-XU5eRJ` gets compressed to `{E` if preceded by `1D4ICC-XU5eRJ`
 
-Consider a simple JSON object: 
+Consider a simple JSON object:
 ```
 {"keyA":"valueA", "keyB":"valueB"}
 ```
@@ -132,8 +132,8 @@ There are lots of repeating bits here.
 We may skip repeating UUIDs and prefix-compress close UUIDs.
 The compressed frame will be just a bit longer than bare JSON:
 ```
-.lww#1D4ICC-XU5eRJ<{E! :keyA"valueA" @{1:keyB"valueB"
-``` 
+.lww#1D4ICC-XU5eRJ`{E! :keyA"valueA" @{1:keyB"valueB"
+```
 That is impressive given the amount of metadata (and you can't replicate data correctly without the metadata).
 The frame takes less space than *two* [RFC4122 UUIDs][rfc4122]; but it contains *twelve* UUIDs (6 distinct UUIDs, 3 distinct timestamps) and also the data.
 The point becomes even clearer if we add the object UUID to JSON using the RFC4122 notation:
